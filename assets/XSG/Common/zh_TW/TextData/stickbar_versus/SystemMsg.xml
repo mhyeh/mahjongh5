@@ -1,0 +1,44 @@
+﻿<dict>
+  <key>Msg_ExitGame_01</key>
+  <string>當局遊戲已託管</string>
+  <key>Msg_ExitGame_02</key>
+  <string>遊戲點數將於當局輸贏結算後歸還</string>
+  <key>Msg_ExitGame_03</key>
+  <string>(當局結束後，不會自動進行下一局)</string>
+  
+  <key>Msg_CreditNotEnough</key>
+  <string>金額不足，返回大廳中</string>
+  
+  <key>Msg_CreditNotUse</key>
+  <string>您的點數不足無法使用</string>
+  
+  <key>Msg_RecordFailed</key>
+  <string>錄音失敗，請重新操作</string>
+  
+  <key>Msg_ExperienceZone</key>
+  <string>本區為1:100體驗區\n遊戲內籌碼將放大100倍</string>
+  
+  <key>Msg_TempUntalkable</key>
+  <string>您被暫時禁言，請靜待禁言時間結束\n若有疑問請洽客服專員</string>
+  
+  <key>Msg_ForeverUntalkable</key>
+  <string>您被永久禁言\n若有疑問請洽客服專員</string>
+  
+  <key>Msg_IndecentWord</key>
+  <string>這則發言內含不雅文字\n系統已自動移除</string>
+    
+  <key>MsgBox_IsExitGame</key>
+  <string>是否離開遊戲?</string>
+    
+  <key>MsgBoxYes</key>
+  <string>確定</string>
+  <key>MsgBoxNo</key>
+  <string>取消</string>
+  
+  <key>MsgBoxKeepOn</key>
+  <string>繼續</string>
+  
+  <key>MsgBoxGoodGame</key>
+  <string>退出</string>
+  
+ </dict>

@@ -1,0 +1,38 @@
+﻿<dict>
+  <key>emoticon_01</key>
+  <string>YA~有夠讚啦! </string>
+  <key>emoticon_02</key>
+  <string>哼~叫我第一名! </string>
+  <key>emoticon_03</key>
+  <string>卯死啊，發財了 </string>
+  <key>emoticon_04</key>
+  <string>嘿…嘿…嘿… </string>  
+  <key>emoticon_05</key>
+  <string>好膽你就來! </string>  
+  <key>emoticon_06</key>
+  <string>好~累~~喔.. </string>
+  <key>emoticon_07</key>
+  <string>拜託，來個好牌吧 </string>
+  <key>emoticon_08</key>
+  <string>有夠龜，打快一點啦!! </string>
+  <key>emoticon_09</key>
+  <string>哇~ 虧大了 </string>
+  <key>emoticon_010</key>
+  <string>慘! 這下挫賽啊~ </string>
+  <key>emoticon_011</key>
+  <string>有夠火大 </string>
+  <key>emoticon_012</key>
+  <string>真不爽，啊~冰的啦!! </string>
+  <key>emoticon_013</key>
+  <string>哇!爆了，我慘囉~ </string>
+  <key>emoticon_014</key>
+  <string>哎唷，看到鬼喔!! </string>
+  
+  <key>emoticonFree</key>
+  <string>(白金會員免費)</string>
+  <key>emoticonPrefix</key>
+  <string>每次 </string>
+  <key>emoticonMoney</key>
+  <string> 老幣 (白金會員免費)</string>
+  
+</dict>

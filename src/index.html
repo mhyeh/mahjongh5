@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui">
+	<title>mahjongh5</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+	<script>
+		const socket = io("http://localhost");
+
+		function join() {
+			const name = document.getElementById("name").value;
+			const room = document.getElementById("room").value;
+
+			if (name === "" || room === "") return;
+			const params = {name: name, room: room};
+			console.log(params);
+
+			localStorage.setItem("name", name);
+			localStorage.setItem("room", room);
+
+			socket.emit("join", params, (message) => {
+				if (message === "room ready") {
+					socket.emit("startGame", params);
+				}
+				if (message === "full") {
+					console.log("this room is full!");
+				}
+			});
+		};
+
+		socket.on("start", (data) => {
+			const players = []
+			let start = 0;
+			for (let i = 0; i < data.players.length; i++) {
+				if (data.players[i] === localStorage.getItem("name")) {
+					start = i;
+					break;
+				}
+			}
+			for (let i = 0; i < 4; i++) {
+				players.push(data.players[(i + start) % 4]);
+			}
+			localStorage.setItem("players", JSON.stringify(players));
+			localStorage.setItem("hand", JSON.stringify(data.hand));
+			window.location = "./game.html";
+		});
+	</script>
+	<style>
+		body {
+			text-align: center;
+			height: 100%;
+		}
+		div {
+			position: relative;
+			top:30vh;
+		}
+		input {
+			height: 50px;
+			width: 400px;
+			border-radius: 10px;
+			font-size: 24pt;
+		}
+		button {
+			height: 50px;
+			width: 150px;
+			border-radius: 10px;
+			background-color: rgb(26, 87, 199);
+			font-size: 24pt;
+			color: white;
+		}
+	</style>
+</head>
+
+<body>
+	<div>
+		<p><input id="name" placeholder="Name"></p>
+		<p><input id="room" placeholder="Room Name"></p>
+		<p></p><button onclick="join()">Join</a></button></p>
+	</div>
+</body>
+
+</html>

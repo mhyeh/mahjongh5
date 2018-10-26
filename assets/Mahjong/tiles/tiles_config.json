@@ -1,0 +1,180 @@
+{
+    "spriteKey": "tiles",
+    "tileWidth": 100,
+    "tileHeight": 200,
+    "configs": [
+        {
+            "tile": "None",
+            "image": "None.jpg"
+        },
+        {
+            "tile": "B1",
+            "image": "Bamboo_1.jpg"
+        },
+        {
+            "tile": "B2",
+            "image": "Bamboo_2.jpg"
+        },
+        {
+            "tile": "B3",
+            "image": "Bamboo_3.jpg"
+        },
+        {
+            "tile": "B4",
+            "image": "Bamboo_4.jpg"
+        },
+        {
+            "tile": "B5",
+            "image": "Bamboo_5.jpg"
+        },
+        {
+            "tile": "B6",
+            "image": "Bamboo_6.jpg"
+        },
+        {
+            "tile": "B7",
+            "image": "Bamboo_7.jpg"
+        },
+        {
+            "tile": "B8",
+            "image": "Bamboo_8.jpg"
+        },
+        {
+            "tile": "B9",
+            "image": "Bamboo_9.jpg"
+        },
+        {
+            "tile": "C1",
+            "image": "Chars_1.jpg"
+        },
+        
+        {
+            "tile": "C2",
+            "image": "Chars_2.jpg"
+        },
+        {
+            "tile": "C3",
+            "image": "Chars_3.jpg"
+        },
+        {
+            "tile": "C4",
+            "image": "Chars_4.jpg"
+        },
+        {
+            "tile": "C5",
+            "image": "Chars_5.jpg"
+        },
+        {
+            "tile": "C6",
+            "image": "Chars_6.jpg"
+        },
+        {
+            "tile": "C7",
+            "image": "Chars_7.jpg"
+        },
+        {
+            "tile": "C8",
+            "image": "Chars_8.jpg"
+        },
+        {
+            "tile": "C9",
+            "image": "Chars_9.jpg"
+        },
+        {
+            "tile": "D1",
+            "image": "Dots_1.jpg"
+        },
+        {
+            "tile": "D2",
+            "image": "Dots_2.jpg"
+        },
+        {
+            "tile": "D3",
+            "image": "Dots_3.jpg"
+        },
+        {
+            "tile": "D4",
+            "image": "Dots_4.jpg"
+        },
+        {
+            "tile": "D5",
+            "image": "Dots_5.jpg"
+        },
+        {
+            "tile": "D6",
+            "image": "Dots_6.jpg"
+        },
+        {
+            "tile": "D7",
+            "image": "Dots_7.jpg"
+        },
+        {
+            "tile": "D8",
+            "image": "Dots_8.jpg"
+        },
+        {
+            "tile": "D9",
+            "image": "Dots_9.jpg"
+        },
+        {
+            "tile": "F1",
+            "image": "Flower_1.jpg"
+        },
+        {
+            "tile": "F2",
+            "image": "Flower_2.jpg"
+        },
+        {
+            "tile": "F3",
+            "image": "Flower_3.jpg"
+        },
+        {
+            "tile": "F4",
+            "image": "Flower_4.jpg"
+        },
+        {
+            "tile": "Spring",
+            "image": "Spring.jpg"
+        },
+        {
+            "tile": "Summer",
+            "image": "Summer.jpg"
+        },
+        {
+            "tile": "Autumn",
+            "image": "Autumn.jpg"
+        },
+        {
+            "tile": "Winter",
+            "image": "Winter.jpg"
+        },
+        {
+            "tile": "North",
+            "image": "North.jpg"
+        },
+        {
+            "tile": "East",
+            "image": "East.jpg"
+        },
+        {
+            "tile": "West",
+            "image": "West.jpg"
+        },
+        {
+            "tile": "South",
+            "image": "South.jpg"
+        },
+        {
+            "tile": "Green",
+            "image": "Green.jpg"
+        },
+        {
+            "tile": "Red",
+            "image": "Red.jpg"
+        },
+        {
+            "tile": "White",
+            "image": "White.jpg"
+        }
+    ]
+}

@@ -1,0 +1,40 @@
+﻿<dict>
+  
+	<key>TopBarMgrLeftBtn</key>
+	<string>EXIT</string>
+
+	<key>InfoMgrName</key>
+	<string>MACHINE</string>
+	<key>InfoMachineOutGift</key>
+	<string>GRANT</string>
+
+	<key>MachineInfo</key>
+	<string>INFO</string>
+	<key>MachineRpm</key>
+	<string>COUNTER</string>
+
+	<key>ExtraGiftMsgNoExtraGift</key>
+	<string>NO INFORMATION</string>	
+	
+	<key>GBRatioBox_ArrayRate</key>
+	<string>100:1,50:1,25:1,20:1,10:1,5:1,2:1,1:1,1:2,1:5,1:10,1:20,1:25,1:50,1:100</string>
+	<key>GBRatioBox_LvLimit0</key>
+	<string>LV.</string>
+	<key>GBRatioBox_LvLimit1</key>
+	<string> UP</string>
+	<key>GBRatioBox_UserDefine0</key>
+	<string>PLAY  </string>
+	<key>GBRatioBox_UserDefine1</key>
+	<string> CREDITS</string>
+	
+	<key>TopBar_ArraySeatType</key>
+	<string>Normal,Platinum,Dianmond,Experence</string>	
+	
+	<key>TopBarMgrRightBtn</key>
+	<string>GRANT</string>
+	
+	<key>LinuxGM_Games</key>
+	<string></string>  
+	<key>EmptyMachineInquiry</key>
+	<string>空機台資訊讀取中,請稍候...</string>  	
+</dict>

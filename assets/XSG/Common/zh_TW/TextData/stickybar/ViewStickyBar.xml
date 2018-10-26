@@ -1,0 +1,127 @@
+﻿<dict>
+  <key>AutoPlayStartMsg</key>
+  <string>已啟動自動模式</string>
+  <key>AutoPlayStopMsg</key>
+  <string>已停止自動模式</string>
+  <key>KeepSeatFailMsg</key>
+  <string>保留失敗，請繼續進行遊戲</string>
+
+  <key>PushMeStoredValue</key>
+  <string>按我儲值</string>
+  <key>GameTestPlay</key>
+  <string>遊戲試玩中</string>
+  <key>LMLogo</key>
+  <string>發財金</string>
+  <key>Register</key>
+  <string>註冊</string>
+  <key>LastPage</key>
+  <string>上頁</string>
+  <key>Gift</key>
+  <string>送1000</string>
+  <key>RegisterMsg1</key>
+  <string>登入玩更多!</string>
+  <key>RegisterMsg2</key>
+  <string>輕鬆成為老子有錢會員</string>
+  <key>Exit</key>
+  <string>離開</string>
+  
+  <key>on</key>
+  <string>開</string>
+  <key>off</key>
+  <string>關</string>
+
+  <key>MsgBoxEnter</key>
+  <string>啟動</string>
+  <key>MsgBoxUse</key>
+  <string>使用</string>
+  <key>MsgBoxYes</key>
+  <string>確定</string>
+  <key>MsgBoxNo</key>
+  <string>取消</string>
+  <key>MsgBoxNoHold</key>
+  <string>不保留</string>
+  <key>MsgBoxHoldGame1</key>
+  <string>是否保留機台座位？</string>
+  <key>MsgBoxHoldGame2</key>
+  <string>按下確認後機台將保留</string>
+  <key>MsgBoxHoldGame3</key>
+  <string>分鐘</string>
+  <key>MsgBoxExitGame1</key>
+  <string>離開遊戲</string>
+  <key>MsgBoxExitGame2</key>
+  <string>機台將保留</string>
+  <key>MsgBoxExitGame3</key>
+  <string>分鐘</string>
+  <key>MsgBoxStored</key>
+  <string>離開遊戲，前往儲值</string>
+  <key>MsgBoxStoredAndStopAutoPlay</key>
+  <string>前往銀行，會停止自動模式！</string>
+  <key>MsgBoxUseSuccess</key>
+  <string>使用成功</string>
+  <key>MsgBoxUseFail</key>
+  <string>使用失敗</string>
+  <key>ItemUseMsgItemCard</key>
+  <string>虛 寶 卡</string>
+  <key>ItemUseMsgNoDeadline</key>
+  <string>永久</string>
+  <key>ItemUseMsgNoItemCard</key>
+  <string>您目前無虛寶卡</string>
+  <key>MsgBoxVirtualTreasureCancel</key>
+  <string>是否取消</string>
+  <key>MsgBoxVirtualTreasure</key>
+  <string>是否取消使用虛寶卡?</string>
+  <key>DoubleCheckItemVTUse</key>
+  <string>我要使用</string>
+  <key>DoubleCheckItemVTCancel</key>
+  <string>我要取消使用</string>
+  <key>MsgBoxAskCrd</key>
+  <string>按下確定後，點數將全攜入遊戲中！</string>
+
+  <key>OptionMenuMgrSound</key>
+  <string>音效</string>
+  <key>OptionMenuMgrAutoHold</key>
+  <string>自動留牌</string>
+  <key>OptionMenuMgrTreasureCards</key>
+  <string>虛寶卡</string>
+  <key>OptionMenuMgrGameRule</key>
+  <string>遊戲說明</string>
+  <key>OptionMenuRevolutions</key>
+  <string>轉數表</string>
+  <key>OptionMenuMgrSeatInfo</key>
+  <string>機台資訊</string>
+  <key>OptionMenuMgrOutGifeF</key>
+  <string>外贈說明</string>
+  <key>OptionMenuMgrSaveSeat</key>
+  <string>保留座位</string>
+  <key>OptionMenuMgrGameLeave</key>
+  <string>離開遊戲</string>
+
+  <key>MachineInfoOutGift</key>
+  <string>外贈</string>
+  <key>MachineInfoMgrName</key>
+  <string>機台資訊</string>
+  <key>RpmInfoMgrName</key>
+  <string>歷史轉數</string>
+  
+  <key>MsgOpenUserRule</key>
+  <string>點我看說明</string>
+  
+  <key>MsgUserRuleTitleForCardType</key>
+  <string>卡 別 優 惠</string>
+  <key>MsgUserRuleTitleForLevel</key>
+  <string>升 等 制 度</string>
+  <key>MsgJoinPlatinumTableFail</key>
+  <string>想進入白金機台嗎?</string>
+  <key>MsgJoinDiamondTableFail</key>
+  <string>想進入鑽石機台嗎?</string>
+  <key>MsgJoinLeveTableFail</key>
+  <string>想進入其他比率機台遊戲嗎?</string>
+  <key>MsgJoinTableFail</key>
+  <string>請先升級為白金會員!</string>
+  <key>MsgPlatinumJoinDiamondTableFail</key>
+  <string>您未滿足進入鑽石機台條件</string>
+  <key>MsgJoinLevelingUp</key>
+  <string>請先提升您的等級!</string>
+　<key>MarqueesCut</key>
+  <string>，</string>
+ </dict>

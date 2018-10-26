@@ -1,0 +1,128 @@
+<dict>
+  <key>AutoPlayStartMsg</key>
+  <string>Auto Mode Started</string>
+  <key>AutoPlayStopMsg</key>
+  <string>Auto Mode Stoped</string>
+  <key>KeepSeatFailMsg</key>
+  <string>Retain Fail, Game Continue</string>
+
+  <key>PushMeStoredValue</key>
+  <string>You don't have\nenough point\nto bet this game</string>
+  <key>GameTestPlay</key>
+  <string>Game Test</string>
+  <key>LMLogo</key>
+  <string>Lucky Money</string>
+  <key>Register</key>
+  <string>REGISTER</string>
+  <key>LastPage</key>
+  <string>EXIT</string>
+  <key>Gift</key>
+  <string>1000!</string>
+  <key>RegisterMsg1</key>
+  <string>Register To Play More</string>
+  <key>RegisterMsg2</key>
+  <string>Easy To Be Member</string>
+  <key>Exit</key>
+  <string>EXIT</string>
+  
+  <key>on</key>
+  <string>ON</string>
+  <key>off</key>
+  <string>OFF</string>
+
+  <key>MsgBoxEnter</key>
+  <string>START</string>
+  <key>MsgBoxUse</key>
+  <string>USE</string>
+  <key>MsgBoxYes</key>
+  <string>CONFIRM</string>
+  <key>MsgBoxNo</key>
+  <string>CANCEL</string>
+  <key>MsgBoxNoHold</key>
+  <string>DONT RETAIN</string>
+  <key>MsgBoxHoldGame1</key>
+  <string>WHETHER RATAIN SEAT?</string>
+  <key>MsgBoxHoldGame2</key>
+  <string>MACHINE WILL REATIN WHEN YOU CONFIRM</string>
+  <key>MsgBoxHoldGame3</key>
+  <string>MINUTES</string>
+  <key>MsgBoxExitGame1</key>
+  <string>Leave Game</string>
+  <key>MsgBoxExitGame2</key>
+  <string>Machine Will Retain</string>
+  <key>MsgBoxExitGame3</key>
+  <string>Minutes</string>
+  <key>MsgBoxStored</key>
+  <string>Leave Game To Charge Points</string>
+  <key>MsgBoxUseSuccess</key>
+  <string>Success To Use</string>
+  <key>MsgBoxUseFail</key>
+  <string>Fail To Use</string>
+  <key>ItemUseMsgItemCard</key>
+  <string>TREASURE CARD</string>
+  <key>ItemUseMsgNoDeadline</key>
+  <string>EVERLASTING</string>
+  <key>ItemUseMsgNoItemCard</key>
+  <string>You Dont Have Treasure Card Now</string>
+  <key>MsgBoxVirtualTreasureCancel</key>
+  <string>Whether To Cancel?</string>
+  <key>MsgBoxVirtualTreasure</key>
+  <string>Whether To Candel Treasure Card</string>
+  <key>DoubleCheckItemVTUse</key>
+  <string>我要使用</string>
+  <key>DoubleCheckItemVTCancel</key>
+  <string>我要取消使用</string>
+
+  <key>OptionMenuMgrSound</key>
+  <string>SOUND</string>
+  <key>OptionMenuMgrAutoHold</key>
+  <string>HOLD</string>
+  <key>OptionMenuMgrTreasureCards</key>
+  <string>TREASURE CARD</string>
+  <key>OptionMenuMgrGameRule</key>
+  <string>INTRODUCE</string>
+  <key>OptionMenuRevolutions</key>
+  <string>SPIN COUNTER</string>
+  <key>OptionMenuMgrSeatInfo</key>
+  <string>MACHINE INFO</string>
+  <key>OptionMenuMgrOutGifeF</key>
+  <string>GRANT INSTRUCTION</string>
+  <key>OptionMenuMgrSaveSeat</key>
+  <string>RETAIN SEAT</string>
+  <key>OptionMenuMgrGameLeave</key>
+  <string>LEAVE GAME</string>
+
+  <key>MachineInfoOutGift</key>
+  <string>GRANT</string>
+  <key>MachineInfoMgrName</key>
+  <string>MACHINE INFO</string>
+  <key>RpmInfoMgrName</key>
+  <string>HISTORY COUNTER</string>
+
+  <key>MsgOpenUserRule</key>
+  <string>INSTRUCTION</string>
+  
+  <key>MsgUserRuleTitleForCardType</key>
+  <string>CARD TYPE</string>
+  <key>MsgUserRuleTitleForLevel</key>
+  <string>LEVEL UP RULE</string>
+  <key>MsgJoinPlatinumTableFail</key>
+  <string>Would You Like To Join Platinum Machine?</string>
+  <key>MsgJoinDiamondTableFail</key>
+  <string>Would You Like To Join Diamond Machine?</string>
+  <key>MsgJoinLeveTableFail</key>
+  <string>Would You Like To Join Another Rate Machine?</string>
+  <key>MsgJoinTableFail</key>
+  <string>Be Platinum Member First Please</string>
+  <key>MsgPlatinumJoinDiamondTableFail</key>
+  <string>Ineligible To Join Diamond Machine</string>
+  <key>MsgJoinLevelingUp</key>
+  <string>Up Your Level First Please</string>
+　<key>MarqueesCut</key>
+  <string>，</string>
+  
+  <!-- en_US/style2/MenuMsg  -->
+  <key>style2/PushMeStoredValue</key>  
+  <string>You don't have\nenough point\nto play this game</string>
+  
+ </dict>

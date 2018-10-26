@@ -1,0 +1,146 @@
+
+goldcat_show.png
+size: 512,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+gc_armL_close
+  rotate: false
+  xy: 277, 162
+  size: 41, 28
+  orig: 41, 28
+  offset: 0, 0
+  index: -1
+gc_armR_close
+  rotate: true
+  xy: 275, 120
+  size: 40, 41
+  orig: 40, 41
+  offset: 0, 0
+  index: -1
+gc_body
+  rotate: false
+  xy: 2, 137
+  size: 128, 104
+  orig: 128, 104
+  offset: 0, 0
+  index: -1
+gc_book
+  rotate: false
+  xy: 132, 166
+  size: 81, 75
+  orig: 81, 75
+  offset: 0, 0
+  index: -1
+gc_book_D
+  rotate: false
+  xy: 215, 185
+  size: 55, 56
+  orig: 55, 56
+  offset: 0, 0
+  index: -1
+gc_book_U
+  rotate: false
+  xy: 272, 192
+  size: 62, 49
+  orig: 62, 49
+  offset: 0, 0
+  index: -1
+gc_collar
+  rotate: false
+  xy: 2, 4
+  size: 106, 31
+  orig: 106, 31
+  offset: 0, 0
+  index: -1
+gc_eye
+  rotate: false
+  xy: 132, 149
+  size: 79, 15
+  orig: 79, 15
+  offset: 0, 0
+  index: -1
+gc_foot_L
+  rotate: true
+  xy: 110, 2
+  size: 33, 29
+  orig: 33, 29
+  offset: 0, 0
+  index: -1
+gc_foot_R
+  rotate: false
+  xy: 132, 120
+  size: 34, 27
+  orig: 34, 27
+  offset: 0, 0
+  index: -1
+gc_gold
+  rotate: true
+  xy: 336, 202
+  size: 39, 54
+  orig: 39, 54
+  offset: 0, 0
+  index: -1
+gc_hand_L
+  rotate: true
+  xy: 168, 116
+  size: 31, 32
+  orig: 31, 32
+  offset: 0, 0
+  index: -1
+gc_hand_R
+  rotate: false
+  xy: 125, 87
+  size: 31, 31
+  orig: 31, 31
+  offset: 0, 0
+  index: -1
+gc_head
+  rotate: false
+  xy: 2, 37
+  size: 121, 98
+  orig: 121, 98
+  offset: 0, 0
+  index: -1
+gc_mouth_close
+  rotate: false
+  xy: 215, 166
+  size: 60, 17
+  orig: 60, 17
+  offset: 0, 0
+  index: -1
+gc_mouth_open
+  rotate: false
+  xy: 213, 143
+  size: 60, 21
+  orig: 60, 21
+  offset: 0, 0
+  index: -1
+gc_wolda_mirL
+  rotate: false
+  xy: 392, 200
+  size: 45, 41
+  orig: 45, 41
+  offset: 0, 0
+  index: -1
+gc_wolda_mirR
+  rotate: true
+  xy: 439, 198
+  size: 43, 44
+  orig: 43, 44
+  offset: 0, 0
+  index: -1
+gc_wrist
+  rotate: false
+  xy: 125, 66
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+point
+  rotate: false
+  xy: 485, 216
+  size: 25, 25
+  orig: 25, 25
+  offset: 0, 0
+  index: -1

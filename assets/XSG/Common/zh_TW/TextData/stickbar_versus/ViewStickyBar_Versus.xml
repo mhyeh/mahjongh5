@@ -1,0 +1,41 @@
+﻿<dict>
+	<key>LoadingResources</key>
+	<string>資源載入配置中 ...</string>
+
+	<key>Group_04</key>
+	<string>體驗區</string>
+	<key>Group_05</key>
+	<string>初級區</string>
+	<key>Group_06</key>
+	<string>中級區</string>
+	<key>Group_07</key>
+	<string>高級區</string>
+	<key>Group_08</key>
+	<string>白金區</string>
+	
+	<key>setting_sound</key>
+	<string>音效</string>
+	<key>setting_screen</key>
+	<string>畫面</string>
+	<key>setting_deposit</key>
+	<string>儲值</string>
+	<key>switch_auto</key>
+	<string>自動</string>
+	<key>switch_vertical</key>
+	<string>直式</string>
+	<key>switch_horizontal</key>
+	<string>橫式</string>
+	
+	<key>list_item</key>
+	<string>●</string>
+	
+	<key>playerName_wrapper_0</key>
+	<string>【</string>
+	<key>playerName_wrapper_1</key>
+	<string>】</string>
+	<key>label_click2key</key>
+	<string>點擊輸入文字</string>
+	<key>label_talk_too_frequent</key>
+	<string>您的發言次數太頻繁</string>
+  
+ </dict>

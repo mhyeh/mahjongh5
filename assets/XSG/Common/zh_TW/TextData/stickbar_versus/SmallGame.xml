@@ -1,0 +1,10 @@
+﻿<dict>
+	<key>label_loading</key>
+	<string>資料載入中...</string>
+	<key>label_rank</key>
+	<string>已進榜排名 </string>
+	<key>label_score</key>
+	<string>分</string>
+	<key>label_progress</key>
+	<string>局數未達成</string>
+ </dict>

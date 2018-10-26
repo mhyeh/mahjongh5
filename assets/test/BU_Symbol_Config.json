@@ -1,0 +1,97 @@
+{
+  "spriteCount": 2,
+  "spriteKey": "BU_Symbol",
+  "configs": [
+    {
+      "symbol": "WW",
+      "spriteFrames": [
+        "BU_SymbolWW.png",
+        "BU_SymbolBG.png"
+      ]
+    },
+    {
+      "symbol": "C1",
+      "spriteFrames": [
+        "BU_SymbolC1.png",
+        "BU_SymbolBG.png"
+      ]
+    },
+    {
+      "symbol": "M1",
+      "spriteFrames": [
+        "BU_SymbolGM1.png",
+        "BU_SymbolGM1_BG.png"
+      ]
+    },
+    {
+      "symbol": "M2",
+      "spriteFrames": [
+        "BU_SymbolGM2.png",
+        "BU_SymbolGM2_BG.png"
+      ]
+    },
+    {
+      "symbol": "M3",
+      "spriteFrames": [
+        "BU_SymbolGM3.png",
+        "BU_SymbolGM3_BG.png"
+      ]
+    },
+    {
+      "symbol": "M4",
+      "spriteFrames": [
+        "BU_SymbolGM4.png",
+        "BU_SymbolGM4_BG.png"
+      ]
+    },
+    {
+      "symbol": "M5",
+      "spriteFrames": [
+        "BU_SymbolM5.png",
+        "BU_SymbolBG.png"
+      ]
+    },
+    {
+      "symbol": "AA",
+      "spriteFrames": [
+        "BU_SymbolM6.png",
+        "BU_SymbolBG.png"
+      ]
+    },
+    {
+      "symbol": "KK",
+      "spriteFrames": [
+        "BU_SymbolM7.png",
+        "BU_SymbolBG.png"
+      ]
+    },
+    {
+      "symbol": "QQ",
+      "spriteFrames": [
+        "BU_SymbolM8.png",
+        "BU_SymbolBG.png"
+      ]
+    },
+    {
+      "symbol": "JJ",
+      "spriteFrames": [
+        "BU_SymbolM9.png",
+        "BU_SymbolBG.png"
+      ]
+    },
+    {
+      "symbol": "TN",
+      "spriteFrames": [
+        "BU_SymbolM10.png",
+        "BU_SymbolBG.png"
+      ]
+    },
+    {
+      "symbol": "NI",
+      "spriteFrames": [
+        "BU_SymbolM11.png",
+        "BU_SymbolBG.png"
+      ]
+    }
+  ]
+}

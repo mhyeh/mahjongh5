@@ -1,0 +1,44 @@
+﻿<dict>
+  
+	<key>TopBarMgrLeftBtn</key>
+	<string>上頁</string>
+
+	<key>InfoMgrName</key>
+	<string>機台</string>
+	<key>InfoMachineOutGift</key>
+	<string>外贈</string>
+
+	<key>MachineInfo</key>
+	<string>機台資訊</string>
+	<key>MachineRpm</key>
+	<string>轉數表</string>
+
+	<key>ExtraGiftMsgNoExtraGift</key>
+	<string>尚無資料</string>
+
+	<key>GBRatioBox_ArrayRate</key>
+	<string>100:1,50:1,25:1,20:1,10:1,5:1,2:1,1:1,1:2,1:5,1:10,1:20,1:25,1:50,1:100</string>
+	<key>GBRatioBox_LvLimit0</key>
+	<string>LV.</string>
+	<key>GBRatioBox_LvLimit1</key>
+	<string>以上</string>
+	
+	<key>GBRatioBox_UserDefine0</key>
+	<string>一轉 </string>
+	<key>GBRatioBox_UserDefine1</key>
+	<string> 枚</string>
+	<key>GBRatioBox_UserDefine2</key>
+	<string>最高押注</string>
+	
+	<key>TopBar_ArraySeatType</key>
+	<string>一般廳,白金廳,鑽石廳,瘋狂體驗區</string>
+	
+	<key>TopBarMgrRightBtn</key>
+	<string>外贈</string> 
+
+	<key>LinuxGM_Games</key>
+	<string></string>  
+	<key>EmptyMachineInquiry</key>
+	<string>空機台資訊讀取中,請稍候...</string>  	
+	
+</dict>
