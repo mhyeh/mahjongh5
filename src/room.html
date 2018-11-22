@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui">
+	<title>mahjongh5</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script>
+		// const socket = io("http://140.118.127.169:1234");
+		const socket = io("http://140.118.127.157:3000");
+		console.log(socket);
+        window.onload = () => {
+            const name = localStorage.getItem("Username");
+			const room = localStorage.getItem("Room");
+            
+            const params = {Username: name, Room: room};
+            
+            socket.emit("join", params, (message) => {
+				if (message === "Room Ready") {
+					socket.emit("startGame", room, (players) => {
+						storePlayerList(players);
+					});
+				}
+				if (message === "full") {
+					console.log("this room is full!");
+				}
+			});
+        };
+
+		socket.on("updatePlayerList", (data) => {
+			const playerList = $("#player");
+			playerList.empty();
+			for (let i = 0; i < data.length; i++) {
+				playerList.append("<p>" + data[i] + "</p>");
+			}
+		});
+
+		socket.on("storePlayerList", (data) => {
+			const players = []
+			let start = 0;
+			const name = localStorage.getItem("Username");
+			for (let i = 0; i < data.length; i++) {
+				if (data[i] === name) {
+					start = i;
+					break;
+				}
+			}
+			localStorage.setItem("ID", start.toString());
+			for (let i = 0; i < 4; i++) {
+				players.push(data[(i + start) % 4]);
+			}
+			localStorage.setItem("players", JSON.stringify(players));
+		});
+
+		socket.on("dealCard", (data) => {
+			data.sort((a, b) => {
+				if (a < b) {
+					return -1;
+				}
+				if (a > b) {
+					return 1;
+				}
+				return 0;
+			});
+			localStorage.setItem("hand", JSON.stringify(data));
+			window.location = "./game.html";
+		});
+	</script>
+	<style>
+		body {
+			text-align: center;
+			height: 100%;
+		}
+		div {
+			position: relative;
+			top:30vh;
+		}
+		input {
+			height: 50px;
+			width: 400px;
+			border-radius: 10px;
+			font-size: 24pt;
+		}
+		button {
+			height: 50px;
+			width: 150px;
+			border-radius: 10px;
+			background-color: rgb(26, 87, 199);
+			font-size: 24pt;
+			color: white;
+		}
+	</style>
+</head>
+
+<body>
+	<div>
+		<div id="player">
+		</div>
+        <p>wait</p>
+	</div>
+</body>
+
+</html>

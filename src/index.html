@@ -10,45 +10,28 @@
 	<title>mahjongh5</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 	<script>
-		const socket = io("http://localhost");
 
 		function join() {
 			const name = document.getElementById("name").value;
 			const room = document.getElementById("room").value;
-
+			
 			if (name === "" || room === "") return;
-			const params = {name: name, room: room};
-			console.log(params);
 
-			localStorage.setItem("name", name);
-			localStorage.setItem("room", room);
+			localStorage.setItem("Username", name);
+			localStorage.setItem("Room", room);
 
-			socket.emit("join", params, (message) => {
-				if (message === "room ready") {
-					socket.emit("startGame", params);
-				}
-				if (message === "full") {
+			
+			// const socket = io("http://140.118.127.169:1234");
+			const socket = io("http://140.118.127.157:3000");
+
+			socket.emit("playerLogin", room, (message) => {
+				if (message !== undefined && message === "Room is full") {
 					console.log("this room is full!");
+					return;
 				}
+				window.location = "./room.html";
 			});
 		};
-
-		socket.on("start", (data) => {
-			const players = []
-			let start = 0;
-			for (let i = 0; i < data.players.length; i++) {
-				if (data.players[i] === localStorage.getItem("name")) {
-					start = i;
-					break;
-				}
-			}
-			for (let i = 0; i < 4; i++) {
-				players.push(data.players[(i + start) % 4]);
-			}
-			localStorage.setItem("players", JSON.stringify(players));
-			localStorage.setItem("hand", JSON.stringify(data.hand));
-			window.location = "./game.html";
-		});
 	</script>
 	<style>
 		body {

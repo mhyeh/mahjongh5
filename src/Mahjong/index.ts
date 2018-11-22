@@ -71,9 +71,6 @@ export default function WaterMarginStart() {
                 hand[i].TileAnchor = new Phaser.Point(0.5, 0.5);
                 door[i].TileAnchor = new Phaser.Point(0.5, 0.5);
                 hu[i].TileAnchor   = new Phaser.Point(0.5, 0.5);
-
-                hand[i].SetImmediate(["B1", "B2", "B3", "C1", "C1", "C1", "D4", "D5", "D7", "D8", "D8", "Red", "Green", "Green", "Green", "White", "B1", "B2", "B3", "C1", "C1", "C1", "D4", "D5", "D7", "D8", "D8", "Red", "Green"]);
-                door[i].SetImmediate(["B1", "B2", "B3", "C1", "C1", "C1", "D4", "D5", "D7", "D8", "D8", "Red", "Green", "Green", "Green", "White", "B1", "B2", "B3", "C1", "C1", "C1", "D4", "D5", "D7", "D8", "D8", "Red", "Green"]);
             }
             hand[0].position = new Phaser.Point(550,  980);
             hand[1].position = new Phaser.Point(1770, 80);
