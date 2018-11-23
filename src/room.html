@@ -58,15 +58,6 @@
 		});
 
 		socket.on("dealCard", (data) => {
-			data.sort((a, b) => {
-				if (a < b) {
-					return -1;
-				}
-				if (a > b) {
-					return 1;
-				}
-				return 0;
-			});
 			localStorage.setItem("hand", JSON.stringify(data));
 			window.location = "./game.html";
 		});

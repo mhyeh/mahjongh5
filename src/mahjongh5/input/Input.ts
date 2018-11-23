@@ -151,8 +151,8 @@ export default class Input {
         });
     }
 
-    public WaitKeyUp(key: ButtonKey): Promise<ButtonKey> {
-        return new Promise<ButtonKey>((resolve) => {
+    public WaitKeyUp(key: ButtonKey): Promise<any> {
+        return new Promise<any>((resolve) => {
             this[key].onButtonUp.addOnce(resolve);
         });
     }

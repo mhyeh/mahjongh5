@@ -76,17 +76,13 @@ export default abstract class TileList<TileType extends Tile> extends Phaser.Gro
 
     public Enable() {
         for (const tile of this.tiles) {
-            if (tile) {
-                tile.enable = true;
-            }
+            tile.enable = true;
         }
     }
 
     public Disable() {
         for (const tile of this.tiles) {
-            if (tile) {
-                tile.enable = false;
-            }
+            tile.enable = false;
         }
     }
 

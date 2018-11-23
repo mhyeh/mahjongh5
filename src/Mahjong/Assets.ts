@@ -33,6 +33,8 @@ export const button = {
     check: { type: "image", key: "", args: [require("assets/Mahjong/Check.png")] },
     pon: { type: "image", key: "", args: [require("assets/Mahjong/Pon.png")] },
     gon: { type: "image", key: "", args: [require("assets/Mahjong/Gon.png")] },
+    pongon: { type: "image", key: "", args: [require("assets/Mahjong/PonGon.png")] },
+    ongon: { type: "image", key: "", args: [require("assets/Mahjong/OnGon.png")] },
     hu: { type: "image", key: "", args: [require("assets/Mahjong/Hu.png")] },
     none: { type: "image", key: "", args: [require("assets/Mahjong/None.png")] },
 };

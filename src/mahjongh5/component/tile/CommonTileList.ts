@@ -97,6 +97,11 @@ export default class CommonTileList extends TileList<ImageTile> {
         this.tileTable = tileTable;
         for (let i = 0; i < tileCount; i++) {
             this.tiles.push(new ImageTile(this.game, tileTable));
+            if (clickable) {
+                this.tiles[this.tiles.length - 1].setTint(0x707070, 0x707070);
+            } else {
+                this.tiles[this.tiles.length - 1].enable = false;
+            }
         }
         this.addMultiple(this.tiles);
         this.direction = direction;
@@ -127,8 +132,11 @@ export default class CommonTileList extends TileList<ImageTile> {
 
     public AddTile(ID: string) {
         let index = 0;
+        const map: {[key: string]: number} = {c: 0, d: 1, b: 2};
         for (index = 0; index < this.tileCount; index++) {
-            if (this.tiles[index].ID > ID) {
+            const t1 = this.tiles[index].ID;
+            const t2 = ID;
+            if (map[t1.charAt(0)] * 10 + Number(t1.charAt(1)) > map[t2.charAt(0)] * 10 + Number(t2.charAt(1))) {
                 break;
             }
         }
@@ -141,7 +149,10 @@ export default class CommonTileList extends TileList<ImageTile> {
         this.tiles[index].height = this.TileHeight;
         this.tiles[index].AdjustTile(this.tileAnchor, this.tileScale, this.tilePosition);
         if (this.clickable) {
+            this.tiles[index].setTint(0x707070, 0x707070);
             this.Input.AddButton(this.tiles[index], Input.key.Throw, undefined, this.tiles[index].uuid);
+        } else {
+            this.tiles[index].enable = false;
         }
         this.ArrangeTile();
     }

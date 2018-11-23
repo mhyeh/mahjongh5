@@ -42,6 +42,14 @@ export default class ImageTile extends Tile<ImageTileTable> {
         }
     }
 
+    public setTint(disable: number = 0xFFFFFF, down: number = 0xFFFFFF, out: number = 0xFFFFFF, over: number = 0xFFFFFF, up: number = 0xFFFFFF) {
+        this.stateTint.disable = disable;
+        this.stateTint.down    = down;
+        this.stateTint.out     = out;
+        this.stateTint.over    = over;
+        this.stateTint.up      = up;
+    }
+
     protected OnIDChangedHandler() {
         this.UpdateImages();
         super.OnIDChangedHandler();

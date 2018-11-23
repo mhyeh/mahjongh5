@@ -62,16 +62,17 @@ export default function WaterMarginStart() {
             const door = [];
             const hu   = [];
             for (let i = 0; i < 4; i++) {
-                sea.push(new  CommonTileList(game, 0,  tileTable, undefined, 40, 60, i, false, 10));
-                hand.push(new CommonTileList(game, 13, tileTable, undefined, 50, 75, i, true,  16));
-                door.push(new CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false, 16));
-                hu.push(new   CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false, 16));
+                sea.push(new  CommonTileList(game, 0,  tileTable, undefined, 40, 60, i, false,   10));
+                hand.push(new CommonTileList(game, 13, tileTable, undefined, 50, 75, i, i === 0, 16));
+                door.push(new CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false,   16));
+                hu.push(new   CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false,   16));
 
                 sea[i].TileAnchor  = new Phaser.Point(0.5, 0.5);
                 hand[i].TileAnchor = new Phaser.Point(0.5, 0.5);
                 door[i].TileAnchor = new Phaser.Point(0.5, 0.5);
                 hu[i].TileAnchor   = new Phaser.Point(0.5, 0.5);
             }
+
             hand[0].position = new Phaser.Point(550,  980);
             hand[1].position = new Phaser.Point(1770, 80);
             hand[2].position = new Phaser.Point(490,  100);
@@ -105,12 +106,15 @@ export default function WaterMarginStart() {
                 dialog.char.width    = 50;
                 dialog.char.height   = 50;
                 dialog.char.anchor.set(0.5, 0.5);
+                dialog.char.stateTint.down = 0x707070;
                 dialog.dot.width     = 50;
                 dialog.dot.height    = 50;
                 dialog.dot.anchor.set(0.5, 0.5);
+                dialog.dot.stateTint.down = 0x707070;
                 dialog.bamboo.width  = 50;
                 dialog.bamboo.height = 50;
                 dialog.bamboo.anchor.set(0.5, 0.5);
+                dialog.bamboo.stateTint.down = 0x707070;
                 dialog.text = game.add.text(10, 40, "定缺:", { font: "32px Arial", fill: "#FFFFFF" });
                 dialog.text.anchor.set(0, 0.5);
             });
@@ -125,15 +129,30 @@ export default function WaterMarginStart() {
                 dialog.pon.width   = 80;
                 dialog.pon.height  = 80;
                 dialog.pon.anchor.set(0.5, 0.5);
+                dialog.pon.stateTint.down = 0x707070;
                 dialog.gon.width   = 80;
                 dialog.gon.height  = 80;
                 dialog.gon.anchor.set(0.5, 0.5);
+                dialog.gon.stateTint.down = 0x707070;
                 dialog.hu.width    = 80;
                 dialog.hu.height   = 80;
                 dialog.hu.anchor.set(0.5, 0.5);
+                dialog.hu.stateTint.down = 0x707070;
                 dialog.none.width  = 80;
                 dialog.none.height = 80;
                 dialog.none.anchor.set(0.5, 0.5);
+                dialog.none.stateTint.down = 0x707070;
+
+                dialog.pongon  = new Button(game, 100, -50, Assets.button.pongon.key);
+                dialog.ongon   = new Button(game, 190, -50, Assets.button.ongon.key);
+                dialog.pongon.width  = 80;
+                dialog.pongon.height = 80;
+                dialog.pongon.anchor.set(0.5, 0.5);
+                dialog.pongon.stateTint.down = 0x707070;
+                dialog.ongon.width   = 80;
+                dialog.ongon.height  = 80;
+                dialog.ongon.anchor.set(0.5, 0.5);
+                dialog.ongon.stateTint.down = 0x707070;
             });
             commandDialog.position = new Phaser.Point(1100, 800);
             commandDialog.backgroundAlpha = 0;

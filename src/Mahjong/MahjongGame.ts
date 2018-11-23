@@ -89,6 +89,9 @@ export default class MahjongGame extends State {
         this.ui.Input.AddButton(this.commandDialog.hu,   Input.key.command, undefined, Input.key.Hu);
         this.ui.Input.AddButton(this.commandDialog.none, Input.key.command, undefined, Input.key.None);
 
+        this.ui.Input.AddButton(this.commandDialog.pongon, Input.key.Gon, undefined, COMMAND_TYPE.COMMAND_PONGON);
+        this.ui.Input.AddButton(this.commandDialog.ongon,  Input.key.Gon, undefined, COMMAND_TYPE.COMMAND_ONGON);
+
         this.ui.Refresh();
 
         this.id       = Number(localStorage.getItem("ID"));
@@ -177,6 +180,7 @@ export default class MahjongGame extends State {
                 this.hand[0].RemoveTile(changedCard[i]);
             }
             this.socket.emit("changeCard", changedCard);
+            console.log("change", changedCard);
             this.hand[0].Disable();
         });
 
@@ -184,65 +188,110 @@ export default class MahjongGame extends State {
             for (let i = 0; i < 3; i++) {
                 this.hand[0].AddTile(card[i]);
             }
+            this.hand[0].Disable();
+            console.log("afterChange", card, turn);
         });
 
         this.socket.on("lack", async (color: number, time: number) => {
+            console.log("lack");
             this.choseLackDialog.Show();
             const defaultColor = System.DelayValue(time, color);
             const lackColor = await Promise.race([this.ui.Input.WaitKeyUp(Input.key.lack), defaultColor]);
             this.choseLackDialog.Hide();
+            console.log("lack", lackColor);
             this.socket.emit("chooseLack", lackColor);
         });
 
         this.socket.on("afterLack", (data: number[]) => {
-            console.log(data);
+            console.log("afterLack", data);
         });
 
         this.socket.on("throw", async (tile: string, time: number) => {
+            console.log("throw");
             this.hand[0].Enable();
             const defaultCard = System.DelayValue(time, tile);
             const throwCard = await Promise.race([this.hand[0].getClickCardID(), defaultCard]);
             this.socket.emit("throwCard", throwCard);
-            this.hand[0].RemoveTile(throwCard);
+            console.log("throw", throwCard);
             this.hand[0].Disable();
         });
 
-        this.socket.on("command", async (data: {command: number, card: string}) => {
-            if (data.command | Input.key.Hu) {
+        this.socket.on("command", async (cardMap: Map<COMMAND_TYPE, string[]>, command: COMMAND_TYPE, time: number) => {
+            console.log("command");
+            if (command & Input.key.Hu) {
                 this.commandDialog.hu.visible = true;
                 this.commandDialog.hu.enable  = true;
-            } else {
-                this.commandDialog.hu.visible = false;
-                this.commandDialog.hu.enable  = false;
             }
 
-            if (data.command | Input.key.Pon) {
+            if (command & Input.key.Pon) {
                 this.commandDialog.pon.visible = true;
                 this.commandDialog.pon.enable  = true;
-            } else {
-                this.commandDialog.pon.visible = false;
-                this.commandDialog.pon.enable  = false;
             }
 
-            if (data.command | Input.key.Gon) {
+            if (command & Input.key.Gon) {
                 this.commandDialog.gon.visible = true;
                 this.commandDialog.gon.enable  = true;
-            } else {
-                this.commandDialog.gon.visible = false;
-                this.commandDialog.gon.enable  = false;
             }
-            this.commandDialog.none.visible = true;
-            this.commandDialog.none.enable = true;
+
             this.commandDialog.Show();
 
-            const defaultCommand = System.DelayValue(10000, COMMAND_TYPE.NONE);
-            const action = await Promise.race([this.ui.Input.WaitKeyUp(Input.key.command), defaultCommand]);
-            this.socket.emit("sendCommand", action & data.command, data.card);
+            const chooseCommand = async function(self: MahjongGame, cards: Map<COMMAND_TYPE, string[]>, commands: COMMAND_TYPE): Promise<{cmd: COMMAND_TYPE, card: string}> {
+                const action = await self.ui.Input.WaitKeyUp(Input.key.command);
+                let resultCard = "";
+                let resultCommand = COMMAND_TYPE.NONE;
+                if (action === ButtonKey.Hu) {
+                    if (commands & COMMAND_TYPE.COMMAND_HU) {
+                        resultCommand = COMMAND_TYPE.COMMAND_HU;
+                    } else {
+                        resultCommand = COMMAND_TYPE.COMMAND_ZIMO;
+                    }
+                    resultCard    = cards.get(resultCommand)[0];
+                } else if (action === ButtonKey.Pon) {
+                    resultCommand = COMMAND_TYPE.COMMAND_PON;
+                    resultCard    = cards.get(resultCommand)[0];
+                } else {
+                    const isOnGon  = Boolean(commands & COMMAND_TYPE.COMMAND_ONGON);
+                    const isPonGon = Boolean(commands & COMMAND_TYPE.COMMAND_PONGON);
+                    if (isOnGon && isPonGon) {
+                        self.commandDialog.pongon.visible = true;
+                        self.commandDialog.pongon.enable  = true;
+                        self.commandDialog.ongon.visible  = true;
+                        self.commandDialog.ongon.enable   = true;
+                        resultCommand = await self.ui.Input.WaitKeyUp(Input.key.Gon);
+                    } else {
+                        if (!isOnGon && !isPonGon) {
+                            resultCommand = COMMAND_TYPE.COMMAND_GON;
+                        } else if (isOnGon && !isPonGon) {
+                            resultCommand = COMMAND_TYPE.COMMAND_ONGON;
+                        } else {
+                            resultCommand = COMMAND_TYPE.COMMAND_PONGON;
+                        }
+                    }
+                    if (cards.get(resultCommand).length > 1) {
+                        self.commandDialog.setCardButton(cards.get(resultCommand));
+                        for (const button of self.commandDialog.cards) {
+                            self.ui.Input.AddButton(button, ButtonKey.chooseCard, undefined, button.frameName);
+                        }
+                        resultCard = await self.ui.Input.WaitKeyUp(Input.key.chooseCard);
+                    } else {
+                        resultCard = cards.get(resultCommand)[0];
+                    }
+                    self.commandDialog.Hide();
+                }
 
+                return {cmd: resultCommand, card: resultCard};
+            };
+
+            const defaultCommand = System.DelayValue(time, { cmd: COMMAND_TYPE.NONE, card: "" });
+            const result = await Promise.race([chooseCommand(this, cardMap, command), defaultCommand]);
+
+            this.socket.emit("sendCommand", result.cmd, result.card);
+            console.log("command", result.cmd, result.card);
             this.commandDialog.Hide();
         });
 
         this.socket.on("success", (from: number, command: number, card: string, score: number) => {
+            console.log("success", from, command, card, score);
             if (command & COMMAND_TYPE.COMMAND_HU) {
                 this.HU(0, this.getID(from), card);
             } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
@@ -259,11 +308,17 @@ export default class MahjongGame extends State {
         });
 
         this.socket.on("othersThrow", (id: number, card: string) => {
-            this.hand[this.getID(id)].RemoveTile("None");
+            console.log("othersThrow", id, card);
+            if (this.getID(id) === 0) {
+                this.hand[this.getID(id)].RemoveTile(card);
+            } else {
+                this.hand[this.getID(id)].RemoveTile("None");
+            }
             this.sea[this.getID(id)].AddTile(card);
         });
 
         this.socket.on("othersCommand", (from: number, to: number, command: number, card: string, score: number) => {
+            console.log("othersCommand", from, to, command, card, score);
             if (command & COMMAND_TYPE.COMMAND_HU) {
                 this.HU(this.getID(to), this.getID(from), card);
             } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
@@ -279,7 +334,8 @@ export default class MahjongGame extends State {
             }
         });
 
-        this.socket.on("end", (data: Array<{name: string, score: number}>) => {
+        this.socket.on("end", (data: Array<{hand: string, score: number}>) => {
+            console.log("end");
             for (let i = 0; i < 4; i++) {
                 console.log(data[i]);
             }
