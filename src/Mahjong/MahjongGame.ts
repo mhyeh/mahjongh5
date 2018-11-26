@@ -206,18 +206,27 @@ export default class MahjongGame extends State {
             console.log("afterLack", data);
         });
 
-        this.socket.on("throw", async (tile: string, time: number) => {
+        this.socket.on("draw", (card: string) => {
+            console.log("draw", card);
+            this.hand[0].AddTile(card);
+        });
+
+        this.socket.on("throw", async (card: string, time: number) => {
             console.log("throw");
             this.hand[0].Enable();
-            const defaultCard = System.DelayValue(time, tile);
+            const defaultCard = System.DelayValue(time, card);
             const throwCard = await Promise.race([this.hand[0].getClickCardID(), defaultCard]);
             this.socket.emit("throwCard", throwCard);
             console.log("throw", throwCard);
             this.hand[0].Disable();
         });
 
-        this.socket.on("command", async (cardMap: Map<COMMAND_TYPE, string[]>, command: COMMAND_TYPE, time: number) => {
-            console.log("command");
+        this.socket.on("command", async (cardMap: string, command: COMMAND_TYPE, time: number) => {
+            const map: Map<COMMAND_TYPE, string[]> = new Map(JSON.parse(cardMap));
+            console.log("command", map, command);
+
+            this.commandDialog.Show();
+
             if (command & Input.key.Hu) {
                 this.commandDialog.hu.visible = true;
                 this.commandDialog.hu.enable  = true;
@@ -232,8 +241,6 @@ export default class MahjongGame extends State {
                 this.commandDialog.gon.visible = true;
                 this.commandDialog.gon.enable  = true;
             }
-
-            this.commandDialog.Show();
 
             const chooseCommand = async function(self: MahjongGame, cards: Map<COMMAND_TYPE, string[]>, commands: COMMAND_TYPE): Promise<{cmd: COMMAND_TYPE, card: string}> {
                 const action = await self.ui.Input.WaitKeyUp(Input.key.command);
@@ -283,7 +290,7 @@ export default class MahjongGame extends State {
             };
 
             const defaultCommand = System.DelayValue(time, { cmd: COMMAND_TYPE.NONE, card: "" });
-            const result = await Promise.race([chooseCommand(this, cardMap, command), defaultCommand]);
+            const result = await Promise.race([chooseCommand(this, map, command), defaultCommand]);
 
             this.socket.emit("sendCommand", result.cmd, result.card);
             console.log("command", result.cmd, result.card);
@@ -319,18 +326,20 @@ export default class MahjongGame extends State {
 
         this.socket.on("othersCommand", (from: number, to: number, command: number, card: string, score: number) => {
             console.log("othersCommand", from, to, command, card, score);
-            if (command & COMMAND_TYPE.COMMAND_HU) {
-                this.HU(this.getID(to), this.getID(from), card);
-            } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
-                this.ZEMO(this.getID(to), card);
-            } else if (command & COMMAND_TYPE.COMMAND_GON) {
-                this.GON(this.getID(to), this.getID(from), card);
-            } else if (command & COMMAND_TYPE.COMMAND_ONGON) {
-                this.ONGON(this.getID(to), "None");
-            } else if (command & COMMAND_TYPE.COMMAND_PONGON) {
-                this.PONGON(this.getID(to), card);
-            } else if (command & COMMAND_TYPE.COMMAND_PON) {
-                this.PON(this.getID(to), this.getID(from), card);
+            if (this.getID(to) !== 0) {
+                if (command & COMMAND_TYPE.COMMAND_HU) {
+                    this.HU(this.getID(to), this.getID(from), card);
+                } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
+                    this.ZEMO(this.getID(to), card);
+                } else if (command & COMMAND_TYPE.COMMAND_GON) {
+                    this.GON(this.getID(to), this.getID(from), card);
+                } else if (command & COMMAND_TYPE.COMMAND_ONGON) {
+                    this.ONGON(this.getID(to), "None");
+                } else if (command & COMMAND_TYPE.COMMAND_PONGON) {
+                    this.PONGON(this.getID(to), card);
+                } else if (command & COMMAND_TYPE.COMMAND_PON) {
+                    this.PON(this.getID(to), this.getID(from), card);
+                }
             }
         });
 
@@ -345,7 +354,7 @@ export default class MahjongGame extends State {
     }
 
     private getID(id: number) {
-        return (this.id + id) % 4;
+        return (4 + id - this.id) % 4;
     }
 
     private HU(id: number, fromId: number, card: string) {
