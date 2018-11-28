@@ -74,15 +74,31 @@ export default abstract class TileList<TileType extends Tile> extends Phaser.Gro
         }
     }
 
-    public Enable() {
+    public EnableAll() {
         for (const tile of this.tiles) {
             tile.enable = true;
         }
     }
 
-    public Disable() {
+    public DisableAll() {
         for (const tile of this.tiles) {
             tile.enable = false;
+        }
+    }
+
+    public Enable(id: string) {
+        for (const tile of this.tiles) {
+            if (tile.ID === id) {
+                tile.enable = true;
+            }
+        }
+    }
+
+    public Disable(id: string) {
+        for (const tile of this.tiles) {
+            if (tile.ID === id) {
+                tile.enable = false;
+            }
         }
     }
 

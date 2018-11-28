@@ -129,19 +129,22 @@ export default function WaterMarginStart() {
                 dialog.pon.width   = 80;
                 dialog.pon.height  = 80;
                 dialog.pon.anchor.set(0.5, 0.5);
-                dialog.pon.stateTint.down = 0x707070;
+                dialog.pon.stateTint.down    = 0x707070;
+                dialog.pon.stateTint.disable = 0x707070;
                 dialog.gon.width   = 80;
                 dialog.gon.height  = 80;
                 dialog.gon.anchor.set(0.5, 0.5);
-                dialog.gon.stateTint.down = 0x707070;
+                dialog.gon.stateTint.down    = 0x707070;
+                dialog.gon.stateTint.disable = 0x707070;
                 dialog.hu.width    = 80;
                 dialog.hu.height   = 80;
                 dialog.hu.anchor.set(0.5, 0.5);
-                dialog.hu.stateTint.down = 0x707070;
+                dialog.hu.stateTint.down    = 0x707070;
+                dialog.hu.stateTint.disable = 0x707070;
                 dialog.none.width  = 80;
                 dialog.none.height = 80;
                 dialog.none.anchor.set(0.5, 0.5);
-                dialog.none.stateTint.down = 0x707070;
+                dialog.pon.stateTint.down    = 0x707070;
 
                 dialog.pongon  = new Button(game, 100, -50, Assets.button.pongon.key);
                 dialog.ongon   = new Button(game, 190, -50, Assets.button.ongon.key);

@@ -29,17 +29,11 @@ export default class CommandDialog extends Dialog {
 
     public Show(): Promise<DialogResult> {
         this.windowGroup.visible = true;
-        this.pon.visible    = false;
         this.pon.enable     = false;
-        this.hu.visible     = false;
         this.hu.enable      = false;
-        this.gon.visible    = false;
         this.gon.enable     = false;
         this.pongon.visible = false;
-        this.pongon.enable  = false;
         this.ongon.visible  = false;
-        this.ongon.enable   = false;
-        this.none.visible   = true;
         this.none.enable    = true;
         // 設定dialog物件的值
         return super.Show()
