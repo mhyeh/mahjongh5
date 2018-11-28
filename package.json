@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/B10215029/Sloth5.git"
+    "url": "git+https://github.com/BlackKite0206233/mahjongh5.git"
   },
   "keywords": [
     "slot",
@@ -19,35 +19,35 @@
   "author": "NTUST GameLab",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/B10215029/Sloth5/issues"
+    "url": "https://github.com/BlackKite0206233/mahjongh5/issues"
   },
-  "homepage": "https://github.com/B10215029/Sloth5#readme",
+  "homepage": "https://github.com/BlackKite0206233/mahjongh5#readme",
   "devDependencies": {
-    "@types/node": "^8.10.29",
-    "babel-core": "^6.25.0",
-    "babel-loader": "^7.1.1",
-    "babel-polyfill": "^6.23.0",
-    "babel-preset-env": "^1.6.0",
-    "css-loader": "^0.28.11",
-    "expose-loader": "^0.7.3",
-    "file-loader": "^0.11.2",
-    "image-webpack-loader": "^3.4.2",
+    "@types/node": "^10.12.10",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.0.4",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "css-loader": "^1.0.1",
+    "expose-loader": "^0.7.5",
+    "file-loader": "^2.0.0",
+    "image-webpack-loader": "^4.5.0",
     "optimize-js-plugin": "0.0.4",
-    "phaser-ce": "^2.8.2",
-    "screenfull": "^3.3.2",
-    "style-loader": "^0.20.3",
+    "phaser-ce": "^2.11.1",
+    "screenfull": "^3.3.3",
+    "style-loader": "^0.23.1",
     "svg-inline-loader": "^0.8.0",
-    "ts-loader": "^2.3.0",
-    "tslint": "^5.5.0",
-    "tslint-loader": "^3.5.3",
-    "typescript": "^2.4.2",
-    "webpack": "^3.3.0",
-    "webpack-dev-server": "^2.5.1",
-    "webpack-obfuscator": "^0.13.0"
+    "ts-loader": "^5.3.1",
+    "tslint": "^5.11.0",
+    "tslint-loader": "^3.5.4",
+    "typescript": "^3.1.6",
+    "webpack": "^4.26.1",
+    "webpack-dev-server": "^3.1.10",
+    "webpack-obfuscator": "^0.18.0"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
-    "@types/socket.io": "^1.4.38",
+    "@types/socket.io": "^2.1.0",
     "@types/socket.io-client": "^1.4.32",
     "@types/uuid": "^3.4.4",
     "npm": "^6.4.1",
