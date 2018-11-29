@@ -7,10 +7,11 @@ import CommonTileList from "mahjongh5/component/tile/CommonTileList";
 import Button from "mahjongh5/ui/Button";
 import ChoseLackDialog from "./ChoseLackDialog";
 import CommandDialog from "./CommandDialog";
+import NumberFormatter from "mahjongh5/ui/NumberFormatter";
 
 export default function WaterMarginStart() {
-    const GAME_WIDTH  = 1920;
-    const GAME_HEIGHT = 1080;
+    const GAME_WIDTH  = 2000;
+    const GAME_HEIGHT = 1500;
     let renderer = Phaser.CANVAS;
     if (window.location.href.indexOf("render=AUTO") !== -1) {
         renderer = Phaser.AUTO;
@@ -53,47 +54,82 @@ export default function WaterMarginStart() {
         });
 
         mahjong.onCreate.add(() => {
-            const bg = game.add.image(0, 0, Assets.background.key, Assets.background);
+            const bg = game.add.image(0, 0, Assets.image.background.key);
             bg.scale.set(game.width, game.height);
 
             const tileTable = new ImageTileTable(game.cache.getJSON(Assets.tiles.tiles_config.key), Assets.tiles.tiles.key);
-            const sea  = [];
-            const hand = [];
-            const door = [];
-            const hu   = [];
+            const sea   = [];
+            const hand  = [];
+            const door  = [];
+            const hu    = [];
+            const arrow = [];
+            const lack  = [];
+            const name  = [];
             for (let i = 0; i < 4; i++) {
-                sea.push(new  CommonTileList(game, 0,  tileTable, undefined, 40, 60, i, false,   10));
                 hand.push(new CommonTileList(game, 13, tileTable, undefined, 50, 75, i, i === 0, 16));
                 door.push(new CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false,   16));
-                hu.push(new   CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false,   16));
+                hu.push(new   CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false,   16, false));
+                sea.push(new  CommonTileList(game, 0,  tileTable, undefined, 40, 60, i, false,   13, false));
 
-                sea[i].TileAnchor  = new Phaser.Point(0.5, 0.5);
                 hand[i].TileAnchor = new Phaser.Point(0.5, 0.5);
                 door[i].TileAnchor = new Phaser.Point(0.5, 0.5);
                 hu[i].TileAnchor   = new Phaser.Point(0.5, 0.5);
+                sea[i].TileAnchor  = new Phaser.Point(0.5, 0.5);
+
+                arrow.push(game.add.image(0, 0, Assets.image.arrow.key));
+                arrow[i].anchor = new Phaser.Point(0.5, 0.5);
+                arrow[i].angle  = 180 - i * 90;
+                arrow[i].width  = 80;
+                arrow[i].height = 30;
+                arrow[i].tint   = 0x808080;
+
+                lack.push(game.add.image(0, 0, Assets.button.char.key));
+                lack[i].anchor = new Phaser.Point(0.5, 0.5);
+                lack[i].width  = 50;
+                lack[i].height = 50;
+                lack[i].visible = false;
+
+                name.push(game.add.bitmapText(0, 0, Assets.font.yaheiBold52.key, "ID:   "));
             }
 
-            hand[0].position = new Phaser.Point(550,  980);
-            hand[1].position = new Phaser.Point(1770, 80);
+            hand[0].position = new Phaser.Point(700, 1400);
+            door[0].position = new Phaser.Point(700, 1260);
+            hu[0].position   = new Phaser.Point(700, 1170);
+            sea[0].position  = new Phaser.Point(730, 950);
+            lack[0].position = new Phaser.Point(550, 1350);
+            name[0].position = new Phaser.Point(450, 1390);
+
+            hand[1].position = new Phaser.Point(1850, 100);
+            door[1].position = new Phaser.Point(1710, 100);
+            hu[1].position   = new Phaser.Point(1620, 100);
+            sea[1].position  = new Phaser.Point(1400, 400);
+            lack[1].position = new Phaser.Point(1650, 1080);
+            name[1].position = new Phaser.Point(1700, 1040);
+
             hand[2].position = new Phaser.Point(490,  100);
-            hand[3].position = new Phaser.Point(150,  130);
+            door[2].position = new Phaser.Point(490,  240);
+            hu[2].position   = new Phaser.Point(490,  330);
+            sea[2].position  = new Phaser.Point(685,  550);
+            lack[2].position = new Phaser.Point(1500, 60);
+            name[2].position = new Phaser.Point(1550, 80);
 
-            door[0].position = new Phaser.Point(550,  890);
-            door[1].position = new Phaser.Point(1680, 80);
-            door[2].position = new Phaser.Point(490,  190);
-            door[3].position = new Phaser.Point(240,  130);
+            hand[3].position = new Phaser.Point(150, 400);
+            door[3].position = new Phaser.Point(290, 400);
+            hu[3].position   = new Phaser.Point(380, 400);
+            sea[3].position  = new Phaser.Point(600, 430);
+            lack[3].position = new Phaser.Point(90,  250);
+            name[3].position = new Phaser.Point(120, 290);
 
-            sea[0].position = new Phaser.Point(705,  650);
-            sea[1].position = new Phaser.Point(1370, 350);
-            sea[2].position = new Phaser.Point(650,  450);
-            sea[3].position = new Phaser.Point(550,  200);
+            arrow[0].position = new Phaser.Point(game.width / 2, game.height / 2 + 70);
+            arrow[1].position = new Phaser.Point(game.width / 2 + 90, game.height / 2);
+            arrow[2].position = new Phaser.Point(game.width / 2, game.height / 2 - 70);
+            arrow[3].position = new Phaser.Point(game.width / 2 - 90, game.height / 2);
 
-            hu[0].position = new Phaser.Point(550,  800);
-            hu[1].position = new Phaser.Point(1590, 80);
-            hu[2].position = new Phaser.Point(490,  280);
-            hu[3].position = new Phaser.Point(330,  130);
+            const timer = new NumberFormatter(game.add.bitmapText(game.width / 2, game.height / 2, Assets.font.arialBoldNumber32.key, "0", 100));
+            timer.textDisplayer.anchor.set(0.5);
+            timer.textDisplayer.tint = 0x808080;
 
-            const checkButton = new Button(game, 1350, 980, Assets.button.check.key);
+            const checkButton = new Button(game, 1500, 1400, Assets.button.check.key);
             checkButton.width  = 150;
             checkButton.height = 80;
             checkButton.anchor.set(0.5, 0.5);
@@ -118,14 +154,14 @@ export default function WaterMarginStart() {
                 dialog.text = game.add.text(10, 40, "定缺:", { font: "32px Arial", fill: "#FFFFFF" });
                 dialog.text.anchor.set(0, 0.5);
             });
-            choseLackDialog.position = new Phaser.Point(500, 850);
+            choseLackDialog.position = new Phaser.Point(300, 1250);
             choseLackDialog.backgroundAlpha = 0;
 
             const commandDialog = new CommandDialog(game, (dialog: CommandDialog) => {
                 dialog.pon  = new Button(game, 60,   50, Assets.button.pon.key);
-                dialog.gon  = new Button(game, 150,  50, Assets.button.gon.key);
-                dialog.hu   = new Button(game, 240,  50, Assets.button.hu.key);
-                dialog.none = new Button(game, 330,  50, Assets.button.none.key);
+                dialog.gon  = new Button(game, 140,  50, Assets.button.gon.key);
+                dialog.hu   = new Button(game, 220,  50, Assets.button.hu.key);
+                dialog.none = new Button(game, 480,  50, Assets.button.none.key);
                 dialog.pon.width   = 80;
                 dialog.pon.height  = 80;
                 dialog.pon.anchor.set(0.5, 0.5);
@@ -146,8 +182,8 @@ export default function WaterMarginStart() {
                 dialog.none.anchor.set(0.5, 0.5);
                 dialog.pon.stateTint.down    = 0x707070;
 
-                dialog.pongon  = new Button(game, 100, -50, Assets.button.pongon.key);
-                dialog.ongon   = new Button(game, 190, -50, Assets.button.ongon.key);
+                dialog.pongon  = new Button(game, 300, 50, Assets.button.pongon.key);
+                dialog.ongon   = new Button(game, 380, 50, Assets.button.ongon.key);
                 dialog.pongon.width  = 80;
                 dialog.pongon.height = 80;
                 dialog.pongon.anchor.set(0.5, 0.5);
@@ -157,13 +193,19 @@ export default function WaterMarginStart() {
                 dialog.ongon.anchor.set(0.5, 0.5);
                 dialog.ongon.stateTint.down = 0x707070;
             });
-            commandDialog.position = new Phaser.Point(1100, 800);
+            commandDialog.position = new Phaser.Point(1400, 1310);
             commandDialog.backgroundAlpha = 0;
 
             mahjong.sea  = sea;
             mahjong.door = door;
             mahjong.hand = hand;
             mahjong.hu   = hu;
+
+            mahjong.lack = lack;
+            mahjong.name = name;
+
+            mahjong.timer = timer;
+            mahjong.arrow = arrow;
 
             mahjong.ui.checkButton = checkButton;
 

@@ -10,10 +10,10 @@ import CommandTileList from "mahjongh5/component/tile/CommonTileList";
 import * as System from "mahjongh5/System";
 import * as io from "socket.io-client";
 import { COMMAND_TYPE } from "./data/typeSM/MahjongArgs";
-import ImageTile from "mahjongh5/component/tile/ImageTile";
 import ButtonKey from "mahjongh5/input/ButtonKey";
 import ChoseLackDialog from "./ChoseLackDialog";
 import CommandDialog from "./CommandDialog";
+import NumberFormatter from "mahjongh5/ui/NumberFormatter";
 
 export default class MahjongGame extends State {
     public loadMessage = "Loading Scene";
@@ -28,6 +28,12 @@ export default class MahjongGame extends State {
     public choseLackDialog: ChoseLackDialog;
     public commandDialog:   CommandDialog;
 
+    public name: Phaser.BitmapText[];
+    public lack: Phaser.Image[];
+
+    public timer: NumberFormatter<Phaser.BitmapText>;
+    public arrow: Phaser.Image[];
+
     // public bottomMain:
     // public setting:
     // public saveSeat:
@@ -41,9 +47,7 @@ export default class MahjongGame extends State {
     private mainLoopStop:     ((value?: any) => void) | undefined;
 
     private id:       number;
-    private name:     string;
     private roomName: string;
-    private players:  string[];
 
     public get ui(): UIController {
         if (!this.uiController) {
@@ -95,10 +99,8 @@ export default class MahjongGame extends State {
         this.ui.Refresh();
 
         this.id       = Number(localStorage.getItem("ID"));
-        this.name     = localStorage.getItem("Username");
         this.roomName = localStorage.getItem("Room");
-        this.players  = JSON.parse(localStorage.getItem("players"));
-        console.log(JSON.parse(localStorage.getItem("hand")));
+
         this.hand[0].SetImmediate(JSON.parse(localStorage.getItem("hand")));
 
         this.socket.emit("login", this.id, this.roomName, (err: string) => {
@@ -107,8 +109,13 @@ export default class MahjongGame extends State {
             }
         });
 
+        const playerList = JSON.parse(localStorage.getItem("players"));
+        for (let i = 0; i < 4; i++) {
+            this.name[this.getID(i)].text += playerList[i];
+        }
+
         this.socket.on("change", async (defaultCard: string[], time: number) => {
-            console.log("change");
+            console.log("change", time);
             this.hand[0].EnableAll();
             const choseLackCard = async function(self: MahjongGame): Promise<string[]> {
                 const count: {[key: string]: number} = {
@@ -174,7 +181,11 @@ export default class MahjongGame extends State {
             };
             const defaultChange = System.DelayValue(time, defaultCard);
             this.ui.checkButton.visible = true;
+
+            this.timeStart(time / 1000);
             const changedCard = await Promise.race([choseLackCard(this), defaultChange]);
+            this.timeStop();
+
             this.ui.checkButton.visible = false;
             for (let i = 0; i < 3; i++) {
                 this.hand[0].RemoveTile(changedCard[i]);
@@ -196,7 +207,11 @@ export default class MahjongGame extends State {
             console.log("lack");
             this.choseLackDialog.Show();
             const defaultColor = System.DelayValue(time, color);
+
+            this.timeStart(time / 1000);
             const lackColor = await Promise.race([this.ui.Input.WaitKeyUp(Input.key.lack), defaultColor]);
+            this.timeStop();
+
             this.choseLackDialog.Hide();
             console.log("lack", lackColor);
             this.socket.emit("chooseLack", lackColor);
@@ -204,6 +219,11 @@ export default class MahjongGame extends State {
 
         this.socket.on("afterLack", (data: number[]) => {
             console.log("afterLack", data);
+            const mapping = ["char", "dot", "bamboo"];
+            for (let i = 0; i < 4; i++) {
+                this.lack[this.getID(i)].loadTexture(mapping[data[i]]);
+                this.lack[i].visible = true;
+            }
         });
 
         this.socket.on("draw", (card: string) => {
@@ -215,7 +235,11 @@ export default class MahjongGame extends State {
             console.log("throw");
             this.hand[0].EnableAll();
             const defaultCard = System.DelayValue(time, card);
+
+            this.timeStart(time / 1000);
             const throwCard = await Promise.race([this.hand[0].getClickCardID(), defaultCard]);
+            this.timeStop();
+
             this.socket.emit("throwCard", throwCard);
             console.log("throw", throwCard);
             this.hand[0].DisableAll();
@@ -295,7 +319,11 @@ export default class MahjongGame extends State {
             };
 
             const defaultCommand = System.DelayValue(time, { cmd: COMMAND_TYPE.NONE, card: "" });
+
+            this.timeStart(time / 1000);
             const result = await Promise.race([chooseCommand(this, map, command), defaultCommand]);
+            this.timeStop();
+
             this.hand[0].DisableAll();
             this.socket.emit("sendCommand", result.cmd, result.card);
             console.log("command", result.cmd, result.card);
@@ -328,6 +356,13 @@ export default class MahjongGame extends State {
         });
 
         this.socket.on("othersDraw", (id: number) => {
+            for (let i = 0; i < 4; i++) {
+                if (this.getID(id) === i) {
+                    this.arrow[i].tint = 0xFFFFFF;
+                } else {
+                    this.arrow[i].tint = 0x808080;
+                }
+            }
             if (this.getID(id) !== 0) {
                 this.hand[this.getID(id)].AddTile("None");
             }
@@ -370,6 +405,20 @@ export default class MahjongGame extends State {
         });
 
         // this.StartMainLoop();
+    }
+
+    private async timeStart(time: number): Promise<void> {
+        this.timer.value = time;
+        this.timer.textDisplayer.tint = 0xFFFFFF;
+        while (this.timer.value > 0) {
+            await System.Delay(1000);
+            this.timer.value--;
+        }
+    }
+
+    private timeStop() {
+        this.timer.value = 0;
+        this.timer.textDisplayer.tint = 0x808080;
     }
 
     private getID(id: number) {
