@@ -8,6 +8,7 @@ import Button from "mahjongh5/ui/Button";
 import ChoseLackDialog from "./ChoseLackDialog";
 import CommandDialog from "./CommandDialog";
 import NumberFormatter from "mahjongh5/ui/NumberFormatter";
+import ChangeCardEffect from "./effect/ChangeCardEffect";
 
 export default function WaterMarginStart() {
     const GAME_WIDTH  = 2000;
@@ -206,6 +207,8 @@ export default function WaterMarginStart() {
 
             mahjong.timer = timer;
             mahjong.arrow = arrow;
+
+            mahjong.effect.changeCardEffect = new ChangeCardEffect(game, tileTable);
 
             mahjong.ui.checkButton = checkButton;
 

@@ -14,6 +14,7 @@ import ButtonKey from "mahjongh5/input/ButtonKey";
 import ChoseLackDialog from "./ChoseLackDialog";
 import CommandDialog from "./CommandDialog";
 import NumberFormatter from "mahjongh5/ui/NumberFormatter";
+import EffectController from "./EffectController";
 
 export default class MahjongGame extends State {
     public loadMessage = "Loading Scene";
@@ -34,9 +35,6 @@ export default class MahjongGame extends State {
     public timer: NumberFormatter<Phaser.BitmapText>;
     public arrow: Phaser.Image[];
 
-    // public bottomMain:
-    // public setting:
-    // public saveSeat:
     private socket: SocketIOClient.Socket;
     private uiController:  UIController;
 
@@ -48,6 +46,15 @@ export default class MahjongGame extends State {
 
     private id:       number;
     private roomName: string;
+
+    private effectController: EffectController;
+
+    public get effect(): EffectController {
+        if (!this.effectController) {
+            this.effectController = new EffectController();
+        }
+        return this.effectController;
+    }
 
     public get ui(): UIController {
         if (!this.uiController) {
@@ -195,7 +202,17 @@ export default class MahjongGame extends State {
             this.hand[0].DisableAll();
         });
 
-        this.socket.on("afterChange", (card: string[], turn: number) => {
+        this.socket.on("broadcastChange", (id: number) => {
+            this.effect.changeCardEffect.Play(0, id);
+            if (this.getID(id) !== 0) {
+                this.hand[this.getID(id)].RemoveTile("None");
+                this.hand[this.getID(id)].RemoveTile("None");
+                this.hand[this.getID(id)].RemoveTile("None");
+            }
+        });
+
+        this.socket.on("afterChange", async (card: string[], turn: number) => {
+            await this.effect.changeCardEffect.Play(1, turn);
             for (let i = 0; i < 3; i++) {
                 this.hand[0].AddTile(card[i]);
             }
@@ -231,6 +248,19 @@ export default class MahjongGame extends State {
             this.hand[0].AddTile(card);
         });
 
+        this.socket.on("broadcastDraw", (id: number) => {
+            for (let i = 0; i < 4; i++) {
+                if (this.getID(id) === i) {
+                    this.arrow[i].tint = 0xFFFFFF;
+                } else {
+                    this.arrow[i].tint = 0x808080;
+                }
+            }
+            if (this.getID(id) !== 0) {
+                this.hand[this.getID(id)].AddTile("None");
+            }
+        });
+
         this.socket.on("throw", async (card: string, time: number) => {
             console.log("throw");
             this.hand[0].EnableAll();
@@ -243,6 +273,16 @@ export default class MahjongGame extends State {
             this.socket.emit("throwCard", throwCard);
             console.log("throw", throwCard);
             this.hand[0].DisableAll();
+        });
+
+        this.socket.on("broadcastThrow", (id: number, card: string) => {
+            console.log("broadcastThrow", id, card);
+            if (this.getID(id) === 0) {
+                this.hand[this.getID(id)].RemoveTile(card);
+            } else {
+                this.hand[this.getID(id)].RemoveTile("None");
+            }
+            this.sea[this.getID(id)].AddTile(card);
         });
 
         this.socket.on("command", async (cardMap: string, command: COMMAND_TYPE, time: number) => {
@@ -347,39 +387,8 @@ export default class MahjongGame extends State {
             }
         });
 
-        this.socket.on("othersChange", (id: number) => {
-            if (this.getID(id) !== 0) {
-                this.hand[this.getID(id)].RemoveTile("None");
-                this.hand[this.getID(id)].RemoveTile("None");
-                this.hand[this.getID(id)].RemoveTile("None");
-            }
-        });
-
-        this.socket.on("othersDraw", (id: number) => {
-            for (let i = 0; i < 4; i++) {
-                if (this.getID(id) === i) {
-                    this.arrow[i].tint = 0xFFFFFF;
-                } else {
-                    this.arrow[i].tint = 0x808080;
-                }
-            }
-            if (this.getID(id) !== 0) {
-                this.hand[this.getID(id)].AddTile("None");
-            }
-        });
-
-        this.socket.on("othersThrow", (id: number, card: string) => {
-            console.log("othersThrow", id, card);
-            if (this.getID(id) === 0) {
-                this.hand[this.getID(id)].RemoveTile(card);
-            } else {
-                this.hand[this.getID(id)].RemoveTile("None");
-            }
-            this.sea[this.getID(id)].AddTile(card);
-        });
-
-        this.socket.on("othersCommand", (from: number, to: number, command: number, card: string, score: number) => {
-            console.log("othersCommand", from, to, command, card, score);
+        this.socket.on("broadcastCommand", (from: number, to: number, command: number, card: string, score: number) => {
+            console.log("broadcastCommand", from, to, command, card, score);
             if (this.getID(to) !== 0) {
                 if (command & COMMAND_TYPE.COMMAND_HU) {
                     this.HU(this.getID(to), this.getID(from), card);
