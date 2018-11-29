@@ -84,7 +84,7 @@ export default class MahjongGame extends State {
         // this.socket = io.connect("http://140.118.127.169:1234");
     }
 
-    public create() {
+    public async create() {
         super.create();
         // this.pointSelector.minValue = 50;
         // this.pointSelector.maxValue = Math.trunc(this.game.client.UserData.account.Credit);
@@ -212,7 +212,9 @@ export default class MahjongGame extends State {
         });
 
         this.socket.on("afterChange", async (card: string[], turn: number) => {
-            await this.effect.changeCardEffect.Play(1, turn);
+            await System.Delay(1500);
+            this.effect.changeCardEffect.Play(1, turn);
+            await System.Delay(2000);
             for (let i = 0; i < 3; i++) {
                 this.hand[0].AddTile(card[i]);
             }

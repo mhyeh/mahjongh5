@@ -5,7 +5,7 @@ import * as Assets from "../Assets";
 import * as System from "mahjongh5/System";
 
 export default class ChangeCardEffect extends Effect {
-    private animCard: CommonTileList[];
+    private animCard: CommonTileList[] = [];
     private anim:     Phaser.Tween[];
     private part2:    Phaser.Tween[];
 
@@ -35,12 +35,6 @@ export default class ChangeCardEffect extends Effect {
         this.anim[3] = game.add.tween(this.animCard[3]).to({ x: game.width  / 2 - 300 }, 1000, Phaser.Easing.Linear.None, false);
 
         this.part2 = new Array<Phaser.Tween>(4);
-
-        for (let i = 0; i < 4; i++) {
-            this.part2[i].onComplete.add(() => {
-                this.animCard[i].visible = false;
-            });
-        }
     }
 
     protected *RunEffect(mode: number, index: number): IterableIterator<Promise<void>> {
@@ -59,7 +53,9 @@ export default class ChangeCardEffect extends Effect {
                         this.animCard[i].position.x = this.game.width  / 2 + Math.floor(300 * Math.cos(this.animCard[i].z * Math.PI / 180));
                         this.animCard[i].position.y = this.game.height / 2 - Math.floor(300 * Math.sin(this.animCard[i].z * Math.PI / 180));
                     }).onComplete.addOnce(() => {
-                        this.part2[i].start();
+                        this.part2[i].start().onComplete.addOnce(() => {
+                            this.animCard[i].visible = false;
+                        });
                     });
                 }
             } else if (index === 1) {
@@ -73,7 +69,9 @@ export default class ChangeCardEffect extends Effect {
                         this.animCard[i].position.x = this.game.width  / 2 - Math.pow(-1, i) * Math.floor(300 * Math.cos(this.animCard[i].z * Math.PI / 180));
                         this.animCard[i].position.y = this.game.height / 2 - Math.pow(-1, i) * Math.floor(300 * Math.sin(this.animCard[i].z * Math.PI / 180));
                     }).onComplete.addOnce(() => {
-                        this.part2[i].start();
+                        this.part2[i].start().onComplete.addOnce(() => {
+                            this.animCard[i].visible = false;
+                        });
                     });
                 }
             } else {
