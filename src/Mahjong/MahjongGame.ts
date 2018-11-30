@@ -32,11 +32,11 @@ export default class MahjongGame extends State {
     public timer: Timer;
     public arrow: Phaser.Image[];
 
-    private socket: SocketIOClient.Socket;
+    public socket: SocketIOClient.Socket;
+
     private uiController:  UIController;
 
-    private id:       number;
-    private roomName: string;
+    private id: number;
 
     private effectController: EffectController;
 
@@ -70,8 +70,6 @@ export default class MahjongGame extends State {
 
     public init() {
         super.init();
-        this.socket = io.connect("http://140.118.127.157:3000");
-        // this.socket = io.connect("http://140.118.127.169:1234");
     }
 
     public async create() {
@@ -92,21 +90,14 @@ export default class MahjongGame extends State {
 
         this.ui.Refresh();
 
-        this.id       = Number(localStorage.getItem("ID"));
-        this.roomName = localStorage.getItem("Room");
-
-        this.hand[0].SetImmediate(JSON.parse(localStorage.getItem("hand")));
-
-        this.socket.emit("login", this.id, this.roomName, (err: string) => {
-            if (err) {
-                console.log(err);
-            }
-        });
+        this.id = Number(localStorage.getItem("ID"));
 
         const playerList = JSON.parse(localStorage.getItem("players"));
         for (let i = 0; i < 4; i++) {
             this.name[this.getID(i)].text += playerList[i];
         }
+
+        this.socket.on("dealCard", (hand: string[]) => this.hand[0].SetImmediate(hand));
 
         this.socket.on("change", (defaultCard: string[], time: number) => this.ChangeCard(defaultCard, time));
         this.socket.on("broadcastChange", (id: number) => this.BroadcastChange(id));

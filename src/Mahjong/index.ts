@@ -10,8 +10,10 @@ import CommandDialog from "./CommandDialog";
 import NumberFormatter from "mahjongh5/ui/NumberFormatter";
 import ChangeCardEffect from "./effect/ChangeCardEffect";
 import Timer from "mahjongh5/component/Timer";
+import JoinState from "./JoinState";
+import * as io from "socket.io-client";
 
-export default function WaterMarginStart() {
+export default function MahjingStart() {
     const GAME_WIDTH  = 2000;
     const GAME_HEIGHT = 1500;
     let renderer = Phaser.CANVAS;
@@ -24,12 +26,15 @@ export default function WaterMarginStart() {
     if (window.location.href.indexOf("render=CANVAS") !== -1) {
         renderer = Phaser.CANVAS;
     }
+
+    const socket = io.connect("http://140.118.127.157:3000");
     Mahjongh5.StartGame((game) => {
         // game setting
-        game.assets    = Assets;
-        game.loadState = new LoadState(game);
-        const mahjong  = new MahjongGame(game);
-        game.gameStates.push(mahjong);
+        game.assets     = Assets;
+        game.loadState  = new LoadState(game);
+        const joinState = new JoinState(game);
+        const mahjong   = new MahjongGame(game);
+        game.gameStates.push(joinState);
         if (window.location.href.indexOf("lang=TW") !== -1) {
             game.language = "TW";
             console.log("set language to TW");
@@ -53,6 +58,11 @@ export default function WaterMarginStart() {
             load.SetPreloadSprite(loadBar, 0);
             load.SetMessageText(loadText);
             load.onProgressChanged.add((sender: any, value: number) => loadProgress.text = (value * 100).toFixed(3) + "%");
+        });
+
+        joinState.onCreate.add(() => {
+
+            joinState.socket = socket;
         });
 
         mahjong.onCreate.add(() => {
@@ -196,6 +206,8 @@ export default function WaterMarginStart() {
             });
             commandDialog.position = new Phaser.Point(1400, 1310);
             commandDialog.backgroundAlpha = 0;
+
+            mahjong.socket = socket;
 
             mahjong.sea  = sea;
             mahjong.door = door;

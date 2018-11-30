@@ -8,28 +8,36 @@
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui">
 	<title>mahjongh5</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 	<script>
-
+		window.onload = () => {
+			$("#waiting").hide();
+		};
 		function join() {
-			const name = document.getElementById("name").value;
-			const room = document.getElementById("room").value;
+			const name = $("#name").val();
 			
-			if (name === "" || room === "") return;
+			if (name === "") return;
 
-			localStorage.setItem("Username", name);
-			localStorage.setItem("Room", room);
-
+			localStorage.setItem("name", name);
 			
 			// const socket = io("http://140.118.127.169:1234");
 			const socket = io("http://140.118.127.157:3000");
 
-			socket.emit("playerLogin", room, (message) => {
-				if (message !== undefined && message === "Room is full") {
-					console.log("this room is full!");
+			socket.emit("join", name, (uuid) => {
+				if (uuid === -1) {
+					console.log("this name was be used");
 					return;
 				}
-				window.location = "./room.html";
+				localStorage.setItem("uuid", uuid);
+				$("#login").hide();
+				$("wating").show();
+			});
+
+			socket.on("readyToStart", (roomName, playerList) => {
+				localStorage.setItem("room", roomName);
+				localStorage.setItem("players", JSON.stringify(playerList));
+				window.location = "./game.html";
 			});
 		};
 	</script>
@@ -56,14 +64,19 @@
 			font-size: 24pt;
 			color: white;
 		}
+		#waiting p {
+			font-size: 50pt;
+		}
 	</style>
 </head>
 
 <body>
-	<div>
+	<div id="login">
 		<p><input id="name" placeholder="Name"></p>
-		<p><input id="room" placeholder="Room Name"></p>
 		<p></p><button onclick="join()">Join</a></button></p>
+	</div>
+	<div id="waiting">
+		<p>WAITING...</p>
 	</div>
 </body>
 
