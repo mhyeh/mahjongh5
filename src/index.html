@@ -11,18 +11,14 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 	<script>
+		const socket = io("http://140.118.127.157:3000");
 		window.onload = () => {
 			$("#waiting").hide();
 		};
 		function join() {
 			const name = $("#name").val();
-			
 			if (name === "") return;
-
 			localStorage.setItem("name", name);
-			
-			// const socket = io("http://140.118.127.169:1234");
-			const socket = io("http://140.118.127.157:3000");
 
 			socket.emit("join", name, (uuid) => {
 				if (uuid === -1) {
@@ -31,15 +27,15 @@
 				}
 				localStorage.setItem("uuid", uuid);
 				$("#login").hide();
-				$("wating").show();
+				$("#waiting").show();
 			});
 
-			socket.on("readyToStart", (roomName, playerList) => {
-				localStorage.setItem("room", roomName);
-				localStorage.setItem("players", JSON.stringify(playerList));
-				window.location = "./game.html";
-			});
 		};
+		socket.on("readyToStart", (roomName, playerList) => {
+			localStorage.setItem("room", roomName);
+			localStorage.setItem("players", JSON.stringify(playerList));
+			window.location = "./game.html";
+		});
 	</script>
 	<style>
 		body {
@@ -55,6 +51,7 @@
 			width: 400px;
 			border-radius: 10px;
 			font-size: 24pt;
+			margin-bottom: 40px;
 		}
 		button {
 			height: 50px;
