@@ -1,10 +1,6 @@
 import State from "mahjongh5/State";
 import Game from "mahjongh5/Game";
-import GameClientSM from "./net/typeSM/GameClientSM";
 import Input from "mahjongh5/input/Input";
-import Account from "mahjongh5/data/Account";
-import MahjongResult from "./net/typeSM/MahjongResult";
-import MahjongArgs from "./data/typeSM/MahjongArgs";
 import UIController from "./UIController";
 import CommandTileList from "mahjongh5/component/tile/CommonTileList";
 import * as System from "mahjongh5/System";
@@ -15,6 +11,7 @@ import ChoseLackDialog from "./ChoseLackDialog";
 import CommandDialog from "./CommandDialog";
 import NumberFormatter from "mahjongh5/ui/NumberFormatter";
 import EffectController from "./EffectController";
+import Timer from "mahjongh5/component/Timer";
 
 export default class MahjongGame extends State {
     public loadMessage = "Loading Scene";
@@ -32,17 +29,11 @@ export default class MahjongGame extends State {
     public name: Phaser.BitmapText[];
     public lack: Phaser.Image[];
 
-    public timer: NumberFormatter<Phaser.BitmapText>;
+    public timer: Timer;
     public arrow: Phaser.Image[];
 
     private socket: SocketIOClient.Socket;
     private uiController:  UIController;
-
-    private mahjongArgs:   MahjongArgs;
-    private mahjongResult: MahjongResult;
-
-    private mainLoopIterator: IterableIterator<Promise<any>> | undefined;
-    private mainLoopStop:     ((value?: any) => void) | undefined;
 
     private id:       number;
     private roomName: string;
@@ -72,13 +63,12 @@ export default class MahjongGame extends State {
      */
     public async LoadStart(progressCallback?: (progress: number) => void): Promise<void> {
         // 連線取得現在盤面資料
-        console.log(this.mahjongResult);
         if (progressCallback) {
             progressCallback(0.8);
         }
     }
 
-    public init(mahjongResult?: MahjongResult) {
+    public init() {
         super.init();
         this.socket = io.connect("http://140.118.127.157:3000");
         // this.socket = io.connect("http://140.118.127.169:1234");
@@ -86,9 +76,6 @@ export default class MahjongGame extends State {
 
     public async create() {
         super.create();
-        // this.pointSelector.minValue = 50;
-        // this.pointSelector.maxValue = Math.trunc(this.game.client.UserData.account.Credit);
-
         this.ui.Input.AddButton(this.choseLackDialog.char,   Input.key.lack, undefined, 0);
         this.ui.Input.AddButton(this.choseLackDialog.dot,    Input.key.lack, undefined, 1);
         this.ui.Input.AddButton(this.choseLackDialog.bamboo, Input.key.lack, undefined, 2);
@@ -121,319 +108,304 @@ export default class MahjongGame extends State {
             this.name[this.getID(i)].text += playerList[i];
         }
 
-        this.socket.on("change", async (defaultCard: string[], time: number) => {
-            console.log("change", time);
-            this.hand[0].EnableAll();
-            const choseLackCard = async function(self: MahjongGame): Promise<string[]> {
-                const count: {[key: string]: number} = {
-                    b: 0,
-                    c: 0,
-                    d: 0,
-                };
-                for (const tile of self.hand[0].tiles) {
-                    count[tile.color]++;
-                }
-                for (const tile of self.hand[0].tiles) {
-                    if (count[tile.color] < 3) {
-                        tile.enable = false;
-                    }
-                }
-                const changeCard: string[] = [];
-                while (1) {
-                    let index = 0;
-                    if (changeCard.length === 3) {
-                        for (const tile of self.hand[0].tiles) {
-                            if (!tile.isClick) {
-                                tile.enable = false;
-                            }
-                        }
-                        self.ui.checkButton.enable = true;
-                        index = await Promise.race([self.hand[0].getClickCardIndex(), self.ui.Input.WaitKeyUp(Input.key.enter)]);
-                    } else {
-                        self.ui.checkButton.enable = false;
-                        index = await self.hand[0].getClickCardIndex();
-                    }
-                    if (index === Input.key.enter) {
-                        return changeCard;
-                    }
-                    if (self.hand[0].tiles[index].isClick) {
-                        const removeIndex = changeCard.findIndex((value) => value === self.hand[0].tiles[index].ID);
-                        changeCard.splice(removeIndex, 1);
-                        self.hand[0].tiles[index].isClick = false;
-                        self.hand[0].tiles[index].position.y += 10;
-                        if (changeCard.length === 0) {
-                            for (const tile of self.hand[0].tiles) {
-                                if (count[tile.color] >= 3) {
-                                    tile.enable = true;
-                                }
-                            }
-                        } else {
-                            for (const tile of self.hand[0].tiles) {
-                                if (tile.color === self.hand[0].tiles[index].color) {
-                                    tile.enable = true;
-                                }
-                            }
-                        }
-                    } else {
-                        changeCard.push(self.hand[0].tiles[index].ID);
-                        self.hand[0].tiles[index].isClick = true;
-                        self.hand[0].tiles[index].position.y -= 10;
-                        for (const tile of self.hand[0].tiles) {
-                            if (tile.color !== self.hand[0].tiles[index].color) {
-                                tile.enable = false;
-                            }
-                        }
-                    }
-                }
-            };
-            const defaultChange = System.DelayValue(time, defaultCard);
-            this.ui.checkButton.visible = true;
+        this.socket.on("change", (defaultCard: string[], time: number) => this.ChangeCard(defaultCard, time));
+        this.socket.on("broadcastChange", (id: number) => this.BroadcastChange(id));
+        this.socket.on("afterChange", (card: string[], turn: number) => this.AfterChange(card, turn));
 
-            this.timeStart(time / 1000);
-            const changedCard = await Promise.race([choseLackCard(this), defaultChange]);
-            this.timeStop();
+        this.socket.on("lack", (color: number, time: number) => this.ChooseLack(color, time));
+        this.socket.on("afterLack", (data: number[]) => this.AfterLack(data));
 
-            this.ui.checkButton.visible = false;
-            for (let i = 0; i < 3; i++) {
-                this.hand[0].RemoveTile(changedCard[i]);
-            }
-            this.socket.emit("changeCard", changedCard);
-            console.log("change", changedCard);
-            this.hand[0].DisableAll();
-        });
+        this.socket.on("draw", (card: string) => this.hand[0].AddTile(card));
+        this.socket.on("broadcastDraw", (id: number) => this.BroadcastDraw(id));
 
-        this.socket.on("broadcastChange", (id: number) => {
-            this.effect.changeCardEffect.Play(0, id);
-            if (this.getID(id) !== 0) {
-                this.hand[this.getID(id)].RemoveTile("None");
-                this.hand[this.getID(id)].RemoveTile("None");
-                this.hand[this.getID(id)].RemoveTile("None");
-            }
-        });
+        this.socket.on("throw", async (card: string, time: number) => this.Throw(card, time));
+        this.socket.on("broadcastThrow", (id: number, card: string) => this.BroadcastThrow(id, card));
 
-        this.socket.on("afterChange", async (card: string[], turn: number) => {
-            await System.Delay(1500);
-            this.effect.changeCardEffect.Play(1, turn);
-            await System.Delay(2000);
-            for (let i = 0; i < 3; i++) {
-                this.hand[0].AddTile(card[i]);
-            }
-            this.hand[0].DisableAll();
-            console.log("afterChange", card, turn);
-        });
+        this.socket.on("command", async (cardMap: string, command: COMMAND_TYPE, time: number) => this.Command(cardMap, command, time));
+        this.socket.on("success", (from: number, command: number, card: string, score: number) => this.Success(from, command, card, score));
+        this.socket.on("broadcastCommand", (from: number, to: number, command: number, card: string, score: number) => this.BroadcastSuccess(from, to, command, card, score));
 
-        this.socket.on("lack", async (color: number, time: number) => {
-            console.log("lack");
-            this.choseLackDialog.Show();
-            const defaultColor = System.DelayValue(time, color);
-
-            this.timeStart(time / 1000);
-            const lackColor = await Promise.race([this.ui.Input.WaitKeyUp(Input.key.lack), defaultColor]);
-            this.timeStop();
-
-            this.choseLackDialog.Hide();
-            console.log("lack", lackColor);
-            this.socket.emit("chooseLack", lackColor);
-        });
-
-        this.socket.on("afterLack", (data: number[]) => {
-            console.log("afterLack", data);
-            const mapping = ["char", "dot", "bamboo"];
-            for (let i = 0; i < 4; i++) {
-                this.lack[this.getID(i)].loadTexture(mapping[data[i]]);
-                this.lack[i].visible = true;
-            }
-        });
-
-        this.socket.on("draw", (card: string) => {
-            console.log("draw", card);
-            this.hand[0].AddTile(card);
-        });
-
-        this.socket.on("broadcastDraw", (id: number) => {
-            for (let i = 0; i < 4; i++) {
-                if (this.getID(id) === i) {
-                    this.arrow[i].tint = 0xFFFFFF;
-                } else {
-                    this.arrow[i].tint = 0x808080;
-                }
-            }
-            if (this.getID(id) !== 0) {
-                this.hand[this.getID(id)].AddTile("None");
-            }
-        });
-
-        this.socket.on("throw", async (card: string, time: number) => {
-            console.log("throw");
-            this.hand[0].EnableAll();
-            const defaultCard = System.DelayValue(time, card);
-
-            this.timeStart(time / 1000);
-            const throwCard = await Promise.race([this.hand[0].getClickCardID(), defaultCard]);
-            this.timeStop();
-
-            this.socket.emit("throwCard", throwCard);
-            console.log("throw", throwCard);
-            this.hand[0].DisableAll();
-        });
-
-        this.socket.on("broadcastThrow", (id: number, card: string) => {
-            console.log("broadcastThrow", id, card);
-            if (this.getID(id) === 0) {
-                this.hand[this.getID(id)].RemoveTile(card);
-            } else {
-                this.hand[this.getID(id)].RemoveTile("None");
-            }
-            this.sea[this.getID(id)].AddTile(card);
-        });
-
-        this.socket.on("command", async (cardMap: string, command: COMMAND_TYPE, time: number) => {
-            const map: Map<COMMAND_TYPE, string[]> = new Map(JSON.parse(cardMap));
-            console.log("command", map, command);
-
-            this.commandDialog.Show();
-            if (command & Input.key.Hu) {
-                this.commandDialog.hu.enable  = true;
-            }
-            if (command & Input.key.Pon) {
-                this.commandDialog.pon.enable = true;
-            }
-            if (command & Input.key.Gon) {
-                this.commandDialog.gon.enable = true;
-            }
-
-            for (const [key, value] of map) {
-                for (const id of value) {
-                    this.hand[0].Enable(id);
-                }
-            }
-
-            const chooseCommand = async function(self: MahjongGame, cards: Map<COMMAND_TYPE, string[]>, commands: COMMAND_TYPE): Promise<{cmd: COMMAND_TYPE, card: string}> {
-                const action = await self.ui.Input.WaitKeyUp(Input.key.command);
-                let resultCard = "";
-                let resultCommand = COMMAND_TYPE.NONE;
-                if (action === ButtonKey.Hu) {
-                    if (commands & COMMAND_TYPE.COMMAND_HU) {
-                        resultCommand = COMMAND_TYPE.COMMAND_HU;
-                    } else {
-                        resultCommand = COMMAND_TYPE.COMMAND_ZIMO;
-                    }
-                    resultCard = cards.get(resultCommand)[0];
-                } else if (action === ButtonKey.Pon) {
-                    resultCommand = COMMAND_TYPE.COMMAND_PON;
-                    resultCard    = cards.get(resultCommand)[0];
-                } else {
-                    const isOnGon  = Boolean(commands & COMMAND_TYPE.COMMAND_ONGON);
-                    const isPonGon = Boolean(commands & COMMAND_TYPE.COMMAND_PONGON);
-
-                    if (isOnGon && isPonGon) {
-                        self.commandDialog.pongon.visible = true;
-                        self.commandDialog.ongon.visible  = true;
-
-                        self.hand[0].DisableAll();
-                        for (const [key, value] of map) {
-                            if (key === COMMAND_TYPE.COMMAND_ONGON || key === COMMAND_TYPE.COMMAND_PONGON) {
-                                for (const id of value) {
-                                    self.hand[0].Enable(id);
-                                }
-                            }
-                        }
-
-                        resultCommand = await self.ui.Input.WaitKeyUp(Input.key.Gon);
-                    } else {
-                        if (!isOnGon && !isPonGon) {
-                            resultCommand = COMMAND_TYPE.COMMAND_GON;
-                        } else if (isOnGon && !isPonGon) {
-                            resultCommand = COMMAND_TYPE.COMMAND_ONGON;
-                        } else {
-                            resultCommand = COMMAND_TYPE.COMMAND_PONGON;
-                        }
-                    }
-
-                    if (cards.get(resultCommand).length > 1) {
-                        resultCard = await self.hand[0].getClickCardID();
-                    } else {
-                        resultCard = cards.get(resultCommand)[0];
-                    }
-                }
-
-                return {cmd: resultCommand, card: resultCard};
-            };
-
-            const defaultCommand = System.DelayValue(time, { cmd: COMMAND_TYPE.NONE, card: "" });
-
-            this.timeStart(time / 1000);
-            const result = await Promise.race([chooseCommand(this, map, command), defaultCommand]);
-            this.timeStop();
-
-            this.hand[0].DisableAll();
-            this.socket.emit("sendCommand", result.cmd, result.card);
-            console.log("command", result.cmd, result.card);
-            this.commandDialog.Hide();
-        });
-
-        this.socket.on("success", (from: number, command: number, card: string, score: number) => {
-            console.log("success", from, command, card, score);
-            if (command & COMMAND_TYPE.COMMAND_HU) {
-                this.HU(0, this.getID(from), card);
-            } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
-                this.ZEMO(0, card);
-            } else if (command & COMMAND_TYPE.COMMAND_GON) {
-                this.GON(0, this.getID(from), card);
-            } else if (command & COMMAND_TYPE.COMMAND_ONGON) {
-                this.ONGON(0, card);
-            } else if (command & COMMAND_TYPE.COMMAND_PONGON) {
-                this.PONGON(0, card);
-            } else if (command & COMMAND_TYPE.COMMAND_PON) {
-                this.PON(0, this.getID(from), card);
-            }
-        });
-
-        this.socket.on("broadcastCommand", (from: number, to: number, command: number, card: string, score: number) => {
-            console.log("broadcastCommand", from, to, command, card, score);
-            if (this.getID(to) !== 0) {
-                if (command & COMMAND_TYPE.COMMAND_HU) {
-                    this.HU(this.getID(to), this.getID(from), card);
-                } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
-                    this.ZEMO(this.getID(to), card);
-                } else if (command & COMMAND_TYPE.COMMAND_GON) {
-                    this.GON(this.getID(to), this.getID(from), card);
-                } else if (command & COMMAND_TYPE.COMMAND_ONGON) {
-                    this.ONGON(this.getID(to), "None");
-                } else if (command & COMMAND_TYPE.COMMAND_PONGON) {
-                    this.PONGON(this.getID(to), card);
-                } else if (command & COMMAND_TYPE.COMMAND_PON) {
-                    this.PON(this.getID(to), this.getID(from), card);
-                }
-            }
-        });
-
-        this.socket.on("end", (data: Array<{hand: string, score: number}>) => {
-            console.log("end");
-            for (let i = 0; i < 4; i++) {
-                console.log(data[i]);
-            }
-        });
-
-        // this.StartMainLoop();
-    }
-
-    private async timeStart(time: number): Promise<void> {
-        this.timer.value = time;
-        this.timer.textDisplayer.tint = 0xFFFFFF;
-        while (this.timer.value > 0) {
-            await System.Delay(1000);
-            this.timer.value--;
-        }
-    }
-
-    private timeStop() {
-        this.timer.value = 0;
-        this.timer.textDisplayer.tint = 0x808080;
+        this.socket.on("end", (data: Array<{hand: string, score: number}>) => this.End(data));
     }
 
     private getID(id: number) {
         return (4 + id - this.id) % 4;
+    }
+
+    private async ChangeCard(defaultCard: string[], time: number) {
+        this.hand[0].EnableAll();
+
+        const defaultChange = System.DelayValue(time, defaultCard);
+        this.ui.checkButton.visible = true;
+
+        this.timer.timeStart(time);
+        const changedCard = await Promise.race([this.ChoseLackCard(), defaultChange]);
+        this.timer.timeStop();
+
+        this.ui.checkButton.visible = false;
+        for (let i = 0; i < 3; i++) {
+            this.hand[0].RemoveTile(changedCard[i]);
+        }
+        this.socket.emit("changeCard", changedCard);
+        this.hand[0].DisableAll();
+    }
+
+    private async ChoseLackCard(): Promise<string[]> {
+        const count: {[key: string]: number} = { b: 0, c: 0, d: 0 };
+        for (const tile of this.hand[0].tiles) {
+            count[tile.color]++;
+        }
+        for (const tile of this.hand[0].tiles) {
+            if (count[tile.color] < 3) {
+                tile.enable = false;
+            }
+        }
+        const changeCard: string[] = [];
+        while (1) {
+            let index = 0;
+            if (changeCard.length === 3) {
+                for (const tile of this.hand[0].tiles) {
+                    if (!tile.isClick) {
+                        tile.enable = false;
+                    }
+                }
+                this.ui.checkButton.enable = true;
+                index = await Promise.race([this.hand[0].getClickCardIndex(), this.ui.Input.WaitKeyUp(Input.key.enter)]);
+            } else {
+                this.ui.checkButton.enable = false;
+                index = await this.hand[0].getClickCardIndex();
+            }
+            if (index === Input.key.enter) {
+                return changeCard;
+            }
+            if (this.hand[0].tiles[index].isClick) {
+                const removeIndex = changeCard.findIndex((value) => value === this.hand[0].tiles[index].ID);
+                changeCard.splice(removeIndex, 1);
+                this.hand[0].tiles[index].isClick = false;
+                this.hand[0].tiles[index].position.y += 10;
+                if (changeCard.length === 0) {
+                    for (const tile of this.hand[0].tiles) {
+                        if (count[tile.color] >= 3) {
+                            tile.enable = true;
+                        }
+                    }
+                } else {
+                    for (const tile of this.hand[0].tiles) {
+                        if (tile.color === this.hand[0].tiles[index].color) {
+                            tile.enable = true;
+                        }
+                    }
+                }
+            } else {
+                changeCard.push(this.hand[0].tiles[index].ID);
+                this.hand[0].tiles[index].isClick = true;
+                this.hand[0].tiles[index].position.y -= 10;
+                for (const tile of this.hand[0].tiles) {
+                    if (tile.color !== this.hand[0].tiles[index].color) {
+                        tile.enable = false;
+                    }
+                }
+            }
+        }
+    }
+
+    private BroadcastChange(id: number) {
+        this.effect.changeCardEffect.Play(0, id);
+        if (this.getID(id) !== 0) {
+            this.hand[this.getID(id)].RemoveTile("None");
+            this.hand[this.getID(id)].RemoveTile("None");
+            this.hand[this.getID(id)].RemoveTile("None");
+        }
+    }
+
+    private async AfterChange(card: string[], turn: number) {
+        await System.Delay(1500);
+        this.effect.changeCardEffect.Play(1, turn);
+        await System.Delay(2000);
+        for (let i = 0; i < 3; i++) {
+            this.hand[0].AddTile(card[i]);
+        }
+        this.hand[0].DisableAll();
+    }
+
+    private async ChooseLack(color: number, time: number) {
+        this.choseLackDialog.Show();
+        const defaultColor = System.DelayValue(time, color);
+
+        this.timer.timeStart(time);
+        const lackColor = await Promise.race([this.ui.Input.WaitKeyUp(Input.key.lack), defaultColor]);
+        this.timer.timeStop();
+
+        this.choseLackDialog.Hide();
+        this.socket.emit("chooseLack", lackColor);
+    }
+
+    private AfterLack(data: number[]) {
+        const mapping = ["char", "dot", "bamboo"];
+        for (let i = 0; i < 4; i++) {
+            this.lack[this.getID(i)].loadTexture(mapping[data[i]]);
+            this.lack[i].visible = true;
+        }
+    }
+
+    private BroadcastDraw(id: number) {
+        for (let i = 0; i < 4; i++) {
+            if (this.getID(id) === i) {
+                this.arrow[i].tint = 0xFFFFFF;
+            } else {
+                this.arrow[i].tint = 0x808080;
+            }
+        }
+        if (this.getID(id) !== 0) {
+            this.hand[this.getID(id)].AddTile("None");
+        }
+    }
+
+    private async Throw(card: string, time: number) {
+        this.hand[0].EnableAll();
+        const defaultCard = System.DelayValue(time, card);
+
+        this.timer.timeStart(time);
+        const throwCard = await Promise.race([this.hand[0].getClickCardID(), defaultCard]);
+        this.timer.timeStop();
+
+        this.socket.emit("throwCard", throwCard);
+        this.hand[0].DisableAll();
+    }
+
+    private BroadcastThrow(id: number, card: string) {
+        if (this.getID(id) === 0) {
+            this.hand[this.getID(id)].RemoveTile(card);
+        } else {
+            this.hand[this.getID(id)].RemoveTile("None");
+        }
+        this.sea[this.getID(id)].AddTile(card);
+    }
+
+    private async Command(cardMap: string, command: COMMAND_TYPE, time: number) {
+        const map: Map<COMMAND_TYPE, string[]> = new Map(JSON.parse(cardMap));
+
+        this.commandDialog.Show();
+        if (command & Input.key.Hu) {
+            this.commandDialog.hu.enable  = true;
+        }
+        if (command & Input.key.Pon) {
+            this.commandDialog.pon.enable = true;
+        }
+        if (command & Input.key.Gon) {
+            this.commandDialog.gon.enable = true;
+        }
+
+        for (const [key, value] of map) {
+            for (const id of value) {
+                this.hand[0].Enable(id);
+            }
+        }
+
+        const defaultCommand = System.DelayValue(time, { cmd: COMMAND_TYPE.NONE, card: "" });
+
+        this.timer.timeStart(time);
+        const result = await Promise.race([this.ChooseCommand(map, command), defaultCommand]);
+        this.timer.timeStop();
+
+        this.hand[0].DisableAll();
+        this.socket.emit("sendCommand", result.cmd, result.card);
+        this.commandDialog.Hide();
+    }
+
+    private async ChooseCommand(cards: Map<COMMAND_TYPE, string[]>, commands: COMMAND_TYPE): Promise<{cmd: COMMAND_TYPE, card: string}> {
+        const action = await this.ui.Input.WaitKeyUp(Input.key.command);
+        let resultCard = "";
+        let resultCommand = COMMAND_TYPE.NONE;
+        if (action === ButtonKey.Hu) {
+            if (commands & COMMAND_TYPE.COMMAND_HU) {
+                resultCommand = COMMAND_TYPE.COMMAND_HU;
+            } else {
+                resultCommand = COMMAND_TYPE.COMMAND_ZIMO;
+            }
+            resultCard = cards.get(resultCommand)[0];
+        } else if (action === ButtonKey.Pon) {
+            resultCommand = COMMAND_TYPE.COMMAND_PON;
+            resultCard    = cards.get(resultCommand)[0];
+        } else {
+            const isOnGon  = Boolean(commands & COMMAND_TYPE.COMMAND_ONGON);
+            const isPonGon = Boolean(commands & COMMAND_TYPE.COMMAND_PONGON);
+
+            if (isOnGon && isPonGon) {
+                this.commandDialog.pongon.visible = true;
+                this.commandDialog.ongon.visible  = true;
+
+                this.hand[0].DisableAll();
+                for (const [key, value] of cards) {
+                    if (key === COMMAND_TYPE.COMMAND_ONGON || key === COMMAND_TYPE.COMMAND_PONGON) {
+                        for (const id of value) {
+                            this.hand[0].Enable(id);
+                        }
+                    }
+                }
+
+                resultCommand = await this.ui.Input.WaitKeyUp(Input.key.Gon);
+            } else {
+                if (!isOnGon && !isPonGon) {
+                    resultCommand = COMMAND_TYPE.COMMAND_GON;
+                } else if (isOnGon && !isPonGon) {
+                    resultCommand = COMMAND_TYPE.COMMAND_ONGON;
+                } else {
+                    resultCommand = COMMAND_TYPE.COMMAND_PONGON;
+                }
+            }
+
+            if (cards.get(resultCommand).length > 1) {
+                resultCard = await this.hand[0].getClickCardID();
+            } else {
+                resultCard = cards.get(resultCommand)[0];
+            }
+        }
+
+        return {cmd: resultCommand, card: resultCard};
+    }
+
+    private Success(from: number, command: number, card: string, score: number) {
+        console.log("success", from, command, card, score);
+        if (command & COMMAND_TYPE.COMMAND_HU) {
+            this.HU(0, this.getID(from), card);
+        } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
+            this.ZEMO(0, card);
+        } else if (command & COMMAND_TYPE.COMMAND_GON) {
+            this.GON(0, this.getID(from), card);
+        } else if (command & COMMAND_TYPE.COMMAND_ONGON) {
+            this.ONGON(0, card);
+        } else if (command & COMMAND_TYPE.COMMAND_PONGON) {
+            this.PONGON(0, card);
+        } else if (command & COMMAND_TYPE.COMMAND_PON) {
+            this.PON(0, this.getID(from), card);
+        }
+    }
+
+    private BroadcastSuccess(from: number, to: number, command: number, card: string, score: number) {
+        console.log("broadcastCommand", from, to, command, card, score);
+        if (this.getID(to) !== 0) {
+            if (command & COMMAND_TYPE.COMMAND_HU) {
+                this.HU(this.getID(to), this.getID(from), card);
+            } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
+                this.ZEMO(this.getID(to), card);
+            } else if (command & COMMAND_TYPE.COMMAND_GON) {
+                this.GON(this.getID(to), this.getID(from), card);
+            } else if (command & COMMAND_TYPE.COMMAND_ONGON) {
+                this.ONGON(this.getID(to), "None");
+            } else if (command & COMMAND_TYPE.COMMAND_PONGON) {
+                this.PONGON(this.getID(to), card);
+            } else if (command & COMMAND_TYPE.COMMAND_PON) {
+                this.PON(this.getID(to), this.getID(from), card);
+            }
+        }
+    }
+
+    private End(data: Array<{hand: string, score: number}>) {
+        console.log("end");
+        for (let i = 0; i < 4; i++) {
+            console.log(data[i]);
+        }
     }
 
     private HU(id: number, fromId: number, card: string) {

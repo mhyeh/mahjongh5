@@ -9,6 +9,7 @@ import ChoseLackDialog from "./ChoseLackDialog";
 import CommandDialog from "./CommandDialog";
 import NumberFormatter from "mahjongh5/ui/NumberFormatter";
 import ChangeCardEffect from "./effect/ChangeCardEffect";
+import Timer from "mahjongh5/component/Timer";
 
 export default function WaterMarginStart() {
     const GAME_WIDTH  = 2000;
@@ -126,9 +127,8 @@ export default function WaterMarginStart() {
             arrow[2].position = new Phaser.Point(game.width / 2, game.height / 2 - 70);
             arrow[3].position = new Phaser.Point(game.width / 2 - 90, game.height / 2);
 
-            const timer = new NumberFormatter(game.add.bitmapText(game.width / 2, game.height / 2, Assets.font.arialBoldNumber32.key, "0", 100));
-            timer.textDisplayer.anchor.set(0.5);
-            timer.textDisplayer.tint = 0x808080;
+            const timer = new Timer(new NumberFormatter(game.add.bitmapText(game.width / 2, game.height / 2, Assets.font.arialBoldNumber32.key, "0", 100)), undefined, 0x808080);
+            timer.anchor = new Phaser.Point(0.5);
 
             const checkButton = new Button(game, 1500, 1400, Assets.button.check.key);
             checkButton.width  = 150;
