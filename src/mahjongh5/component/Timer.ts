@@ -7,21 +7,22 @@ export default class Timer {
     private enableTint:  number;
     private disableTint: number;
 
-    private timer: NumberFormatter<Phaser.BitmapText>;
+    private timer: NumberFormatter<Phaser.Text>;
 
-    public set anchor(point: Phaser.Point) {
-        this.timer.textDisplayer.anchor = point;
+    public get Text(): Phaser.Text {
+        return this.timer.textDisplayer;
     }
 
-    constructor(timer: NumberFormatter<Phaser.BitmapText>, enableTint: number = 0xFFFFFF, disableTint: number = 0xFFFFFF) {
+    constructor(timer: NumberFormatter<Phaser.Text>, enableTint: number = 0xFFFFFF, disableTint: number = 0xFFFFFF) {
         this.timer = timer;
         this.enableTint  = enableTint;
         this.disableTint = disableTint;
+        this.Text.tint = this.disableTint;
     }
 
     public async timeStart(time: number): Promise<void> {
         this.timer.value = time / SEC;
-        this.timer.textDisplayer.tint = this.enableTint;
+        this.Text.tint = this.enableTint;
         while (this.timer.value > 0) {
             await System.Delay(SEC);
             this.timer.value--;
@@ -30,6 +31,6 @@ export default class Timer {
 
     public timeStop() {
         this.timer.value = 0;
-        this.timer.textDisplayer.tint = this.disableTint;
+        this.Text.tint = this.disableTint;
     }
 }

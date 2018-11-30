@@ -26,7 +26,7 @@ export default class MahjongGame extends State {
     public choseLackDialog: ChoseLackDialog;
     public commandDialog:   CommandDialog;
 
-    public name: Phaser.BitmapText[];
+    public name: Phaser.Text[];
     public lack: Phaser.Image[];
 
     public timer: Timer;

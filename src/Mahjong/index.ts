@@ -101,7 +101,7 @@ export default function MahjingStart() {
                 lack[i].height = 50;
                 lack[i].visible = false;
 
-                name.push(game.add.bitmapText(0, 0, Assets.font.yaheiBold52.key, "ID:   "));
+                name.push(game.add.text(0, 0, "ID:   ", { font: "32px Arial", fill: "#FFFFFF" }));
             }
 
             hand[0].position = new Phaser.Point(700, 1400);
@@ -137,8 +137,8 @@ export default function MahjingStart() {
             arrow[2].position = new Phaser.Point(game.width / 2, game.height / 2 - 70);
             arrow[3].position = new Phaser.Point(game.width / 2 - 90, game.height / 2);
 
-            const timer = new Timer(new NumberFormatter(game.add.bitmapText(game.width / 2, game.height / 2, Assets.font.arialBoldNumber32.key, "0", 100)), undefined, 0x808080);
-            timer.anchor = new Phaser.Point(0.5);
+            const timer = new Timer(new NumberFormatter(game.add.text(game.width / 2, game.height / 2, "0", { font: "100px Arial", fill: "#FFFFFF" })), undefined, 0x808080);
+            timer.Text.anchor.set(0.5);
 
             const checkButton = new Button(game, 1500, 1400, Assets.button.check.key);
             checkButton.width  = 150;
