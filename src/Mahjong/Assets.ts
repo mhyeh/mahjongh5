@@ -22,6 +22,7 @@ export const preload = {
 export const image = {
     background: { type: "image", key: "backgorund", args: [require("assets/Mahjong/background.png")] },
     arrow: { type: "image", key: "", args: [require("assets/Mahjong/arrow.png")] },
+    name_block: { type: "image", key: "", args: [require("assets/Mahjong/name_block.png")] },
 };
 
 export const tiles = {
@@ -30,6 +31,7 @@ export const tiles = {
 };
 
 export const button = {
+    ready: { type: "image", key: "", args: [require("assets/Mahjong/ready.png")] },
     bamboo: { type: "image", key: "bamboo", args: [require("assets/Mahjong/Bamboo.png")] },
     char: { type: "image", key: "char", args: [require("assets/Mahjong/Char.png")] },
     dot: { type: "image", key: "dot", args: [require("assets/Mahjong/Dot.png")] },

@@ -61,8 +61,37 @@ export default function MahjingStart() {
         });
 
         joinState.onCreate.add(() => {
+            const title = game.add.text(game.width / 2, 300, "配對成功", { font: "200px Arial", fill: "#FFFFFF" });
+            title.anchor.set(0.5);
+
+            const nameBlock = [];
+            const idLabel   = [];
+            const name      = [];
+            for (let i = 0; i < 4; i++) {
+                nameBlock.push(game.add.image(400 * (i + 1), game.height / 2, Assets.image.name_block.key));
+                nameBlock[i].anchor.set(0.5);
+                nameBlock[i].width  = 300;
+                nameBlock[i].height = 300;
+
+                idLabel.push(game.add.text(nameBlock[i].x, nameBlock[i].y - 60, "ID", { font: "50px Arial" }));
+                idLabel[i].anchor.set(0.5);
+                name.push(game.add.text(nameBlock[i].x, nameBlock[i].y + 20, "", { font: "32px Arial" }));
+                name[i].anchor.set(0.5);
+            }
+
+            const ready = new Button(game, game.width / 2, 1200, Assets.button.ready.key);
+            ready.anchor.set(0.5);
+            ready.stateTint.down = 0x808080;
+            ready.stateTint.up   = 0xFFFFFF;
 
             joinState.socket = socket;
+
+            joinState.ui.readyButton = ready;
+
+            joinState.name      = name;
+            joinState.nameBlock = nameBlock;
+
+            joinState.mahjongGame = mahjong;
         });
 
         mahjong.onCreate.add(() => {

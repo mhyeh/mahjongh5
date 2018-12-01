@@ -13,7 +13,8 @@ export default class JoinState extends State {
     public game: Game;
     public mahjongGame: MahjongGame;
 
-    public name: Phaser.BitmapText[];
+    public name:      Phaser.Text[];
+    public nameBlock: Phaser.Image[];
 
     public socket: SocketIOClient.Socket;
 
@@ -54,6 +55,9 @@ export default class JoinState extends State {
     public async create() {
         super.create();
 
+        this.ui.Input.AddButton(this.ui.readyButton, Input.key.enter, undefined);
+        this.ui.Refresh();
+
         this.room = localStorage.getItem("room");
         this.uuid = localStorage.getItem("uuid");
         this.socket.emit("auth", this.room, this.uuid, (message?: string) => {
@@ -62,18 +66,31 @@ export default class JoinState extends State {
             }
         });
 
-        this.socket.on("broadcasrReady", (name: string) => {
+        const list = JSON.parse(localStorage.getItem("players"));
+        for (let i = 0; i < 4; i++) {
+            this.name[i].text = list[i];
+        }
+
+        this.socket.on("broadcastReady", (name: string) => {
+            let index = 0;
+            for (let i = 0; i < 4; i++) {
+                if (list[i] === name) {
+                    index = i;
+                }
+            }
+            this.nameBlock[index].tint = 0XFFFF33;
             console.log(name, "ready");
         });
 
         this.socket.on("broadcastGameStart", (playerList: string[]) => {
+            console.log(playerList);
             const players = [];
             for (let i = 0; i < 4; i++) {
                 players.push(playerList[(i + this.ID) % 4]);
             }
 
             localStorage.setItem("players", JSON.stringify(players));
-            this.state.start(this.mahjongGame.key, true, true);
+            this.state.start(this.mahjongGame.key);
         });
 
         this.StartMainLoop();
@@ -109,6 +126,7 @@ export default class JoinState extends State {
 
     private *MainLoop(): IterableIterator<Promise<any>> {
         yield this.ui.Input.WaitKeyUp(Input.key.enter);
+        this.ui.readyButton.visible = false;
         this.socket.emit("ready", this.room, this.uuid, (res: string | number) => {
             if (typeof res === "string") {
                 window.location.href = "./index.html";

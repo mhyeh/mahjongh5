@@ -24,6 +24,7 @@ export default class MahjongUI extends UIController {
     public settingButton:      Button;
     public cancelHelpButton:   Button;
     public checkButton:        Button;
+    public readyButton:        Button;
     // public autoStartButton:    Button;
     // public saveSeatButton: Button;
     // public bottomMainButton: Button;
