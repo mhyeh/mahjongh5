@@ -201,7 +201,7 @@ export default class MahjongGame extends State {
     }
 
     private BroadcastChange(id: number) {
-        this.effect.changeCardEffect.Play(0, id);
+        this.effect.changeCardEffect.Play(0, this.getID(id));
         if (this.getID(id) !== 0) {
             this.hand[this.getID(id)].RemoveTile("None");
             this.hand[this.getID(id)].RemoveTile("None");

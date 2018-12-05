@@ -61,7 +61,7 @@ export default class JoinState extends State {
         this.room = localStorage.getItem("room");
         this.uuid = localStorage.getItem("uuid");
         this.socket.emit("auth", this.room, this.uuid, (message?: string) => {
-            if (typeof message !== "undefined") {
+            if (message !== "") {
                 window.location.href = "./index.html";
             }
         });

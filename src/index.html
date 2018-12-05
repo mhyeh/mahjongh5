@@ -20,8 +20,8 @@
 			if (name === "") return;
 			localStorage.setItem("name", name);
 
-			socket.emit("join", name, (uuid) => {
-				if (uuid === -1) {
+			socket.emit("join", name, (uuid, err) => {
+				if (err) {
 					console.log("this name was be used");
 					return;
 				}
