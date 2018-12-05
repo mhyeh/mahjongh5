@@ -98,6 +98,8 @@ export default function MahjingStart() {
             const bg = game.add.image(0, 0, Assets.image.background.key);
             bg.scale.set(game.width, game.height);
 
+            const remainCard = game.add.text(10, 10, "剩餘張數: 56", { font: "32px Arial", fill: "#FFFFFF" });
+
             const tileTable = new ImageTileTable(game.cache.getJSON(Assets.tiles.tiles_config.key), Assets.tiles.tiles.key);
             const sea   = [];
             const hand  = [];
@@ -106,6 +108,7 @@ export default function MahjingStart() {
             const arrow = [];
             const lack  = [];
             const name  = [];
+            const score = [];
             for (let i = 0; i < 4; i++) {
                 hand.push(new CommonTileList(game, 13, tileTable, undefined, 50, 75, i, i === 0, 16));
                 door.push(new CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false,   16));
@@ -131,35 +134,47 @@ export default function MahjingStart() {
                 lack[i].visible = false;
 
                 name.push(game.add.text(0, 0, "ID:   ", { font: "32px Arial", fill: "#FFFFFF" }));
+                name[i].anchor.set(1, 0.5);
+
+                score.push(game.add.text(0, 0, "score:   ", { font: "32px Arial", fill: "#FFFFFF" }));
+                score[i].anchor.set(1, 0.5);
             }
 
-            hand[0].position = new Phaser.Point(700, 1400);
-            door[0].position = new Phaser.Point(700, 1260);
-            hu[0].position   = new Phaser.Point(700, 1170);
-            sea[0].position  = new Phaser.Point(730, 950);
-            lack[0].position = new Phaser.Point(550, 1350);
-            name[0].position = new Phaser.Point(450, 1390);
+            hand[0].position  = new Phaser.Point(700, 1400);
+            door[0].position  = new Phaser.Point(700, 1260);
+            hu[0].position    = new Phaser.Point(700, 1170);
+            sea[0].position   = new Phaser.Point(730, 950);
+            lack[0].position  = new Phaser.Point(550, 1350);
+            name[0].position  = new Phaser.Point(620, 1410);
+            score[0].position = new Phaser.Point(620, 1450);
 
-            hand[1].position = new Phaser.Point(1850, 100);
-            door[1].position = new Phaser.Point(1710, 100);
-            hu[1].position   = new Phaser.Point(1620, 100);
-            sea[1].position  = new Phaser.Point(1400, 400);
-            lack[1].position = new Phaser.Point(1650, 1080);
-            name[1].position = new Phaser.Point(1700, 1040);
+            hand[1].position  = new Phaser.Point(1850, 100);
+            door[1].position  = new Phaser.Point(1710, 100);
+            hu[1].position    = new Phaser.Point(1620, 100);
+            sea[1].position   = new Phaser.Point(1400, 400);
+            lack[1].position  = new Phaser.Point(1650, 1080);
+            name[1].position  = new Phaser.Point(1900, 1060);
+            score[1].position = new Phaser.Point(1900, 1100);
 
-            hand[2].position = new Phaser.Point(490,  100);
-            door[2].position = new Phaser.Point(490,  240);
-            hu[2].position   = new Phaser.Point(490,  330);
-            sea[2].position  = new Phaser.Point(685,  550);
-            lack[2].position = new Phaser.Point(1500, 60);
-            name[2].position = new Phaser.Point(1550, 80);
+            hand[2].position  = new Phaser.Point(490,  100);
+            door[2].position  = new Phaser.Point(490,  240);
+            hu[2].position    = new Phaser.Point(490,  330);
+            sea[2].position   = new Phaser.Point(685,  550);
+            lack[2].position  = new Phaser.Point(1500, 60);
+            name[2].position  = new Phaser.Point(1450, 120);
+            score[2].position = new Phaser.Point(1450, 160);
+            name[2].anchor.x  = 0;
+            score[2].anchor.x = 0;
 
-            hand[3].position = new Phaser.Point(150, 400);
-            door[3].position = new Phaser.Point(290, 400);
-            hu[3].position   = new Phaser.Point(380, 400);
-            sea[3].position  = new Phaser.Point(600, 430);
-            lack[3].position = new Phaser.Point(90,  250);
-            name[3].position = new Phaser.Point(120, 290);
+            hand[3].position  = new Phaser.Point(150, 400);
+            door[3].position  = new Phaser.Point(290, 400);
+            hu[3].position    = new Phaser.Point(380, 400);
+            sea[3].position   = new Phaser.Point(600, 430);
+            lack[3].position  = new Phaser.Point(90,  250);
+            name[3].position  = new Phaser.Point(80, 310);
+            score[3].position = new Phaser.Point(80, 350);
+            name[3].anchor.x  = 0;
+            score[3].anchor.x = 0;
 
             arrow[0].position = new Phaser.Point(game.width / 2, game.height / 2 + 70);
             arrow[1].position = new Phaser.Point(game.width / 2 + 90, game.height / 2);
@@ -238,13 +253,16 @@ export default function MahjingStart() {
 
             mahjong.socket = socket;
 
+            mahjong.remainCard = remainCard;
+
             mahjong.sea  = sea;
             mahjong.door = door;
             mahjong.hand = hand;
             mahjong.hu   = hu;
 
-            mahjong.lack = lack;
-            mahjong.name = name;
+            mahjong.lack      = lack;
+            mahjong.name      = name;
+            mahjong.scoreText = score;
 
             mahjong.timer = timer;
             mahjong.arrow = arrow;
