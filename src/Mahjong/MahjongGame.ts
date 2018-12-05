@@ -26,8 +26,10 @@ export default class MahjongGame extends State {
     public choseLackDialog: ChoseLackDialog;
     public commandDialog:   CommandDialog;
 
-    public name: Phaser.Text[];
-    public lack: Phaser.Image[];
+    public lack:       Phaser.Image[];
+    public name:       Phaser.Text[];
+    public scoreText:  Phaser.Text[];
+    public remainCard: Phaser.Text;
 
     public timer: Timer;
     public arrow: Phaser.Image[];
@@ -39,6 +41,8 @@ export default class MahjongGame extends State {
     private id: number;
 
     private effectController: EffectController;
+
+    private score: number[] = [0, 0, 0, 0];
 
     public get effect(): EffectController {
         if (!this.effectController) {
@@ -94,8 +98,11 @@ export default class MahjongGame extends State {
 
         const playerList = JSON.parse(localStorage.getItem("players"));
         for (let i = 0; i < 4; i++) {
-            this.name[this.getID(i)].text += playerList[i];
+            this.name[this.getID(i)].text += playerList[this.getID(i)];
+            this.scoreText[i].text = "score:   " + this.score[i];
         }
+
+        this.socket.on("remainCard", (num: number) => { this.remainCard.text = "剩餘張數: " + num; });
 
         this.socket.on("dealCard", (hand: string[]) => this.hand[0].SetImmediate(hand));
 
@@ -216,6 +223,11 @@ export default class MahjongGame extends State {
         for (let i = 0; i < 3; i++) {
             this.hand[0].AddTile(card[i]);
         }
+        for (let i = 1; i < 4; i++) {
+            for (let j = 0; j < 3; j++) {
+                this.hand[i].AddTile("None");
+            }
+        }
         this.hand[0].DisableAll();
     }
 
@@ -267,6 +279,7 @@ export default class MahjongGame extends State {
     private BroadcastThrow(id: number, card: string) {
         if (this.getID(id) === 0) {
             this.hand[this.getID(id)].RemoveTile(card);
+            this.hand[0].DisableAll();
         } else {
             this.hand[this.getID(id)].RemoveTile("None");
         }
@@ -274,7 +287,11 @@ export default class MahjongGame extends State {
     }
 
     private async Command(cardMap: string, command: COMMAND_TYPE, time: number) {
-        const map: Map<COMMAND_TYPE, string[]> = new Map(JSON.parse(cardMap));
+        const json = JSON.parse(cardMap);
+        const map: Map<COMMAND_TYPE, string[]> = new Map<COMMAND_TYPE, string[]>();
+        for (const row of json) {
+            map.set(row.Key, row.Value);
+        }
 
         this.commandDialog.Show();
         if (command & Input.key.Hu) {
@@ -359,15 +376,15 @@ export default class MahjongGame extends State {
     private Success(from: number, command: number, card: string, score: number) {
         console.log("success", from, command, card, score);
         if (command & COMMAND_TYPE.COMMAND_HU) {
-            this.HU(0, this.getID(from), card);
+            this.HU(0, this.getID(from), card, score);
         } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
-            this.ZEMO(0, card);
+            this.ZEMO(0, card, score);
         } else if (command & COMMAND_TYPE.COMMAND_GON) {
-            this.GON(0, this.getID(from), card);
+            this.GON(0, this.getID(from), card, score);
         } else if (command & COMMAND_TYPE.COMMAND_ONGON) {
-            this.ONGON(0, card);
+            this.ONGON(0, card, score);
         } else if (command & COMMAND_TYPE.COMMAND_PONGON) {
-            this.PONGON(0, card);
+            this.PONGON(0, card, score);
         } else if (command & COMMAND_TYPE.COMMAND_PON) {
             this.PON(0, this.getID(from), card);
         }
@@ -377,19 +394,20 @@ export default class MahjongGame extends State {
         console.log("broadcastCommand", from, to, command, card, score);
         if (this.getID(to) !== 0) {
             if (command & COMMAND_TYPE.COMMAND_HU) {
-                this.HU(this.getID(to), this.getID(from), card);
+                this.HU(this.getID(to), this.getID(from), card, score);
             } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
-                this.ZEMO(this.getID(to), card);
+                this.ZEMO(this.getID(to), card, score);
             } else if (command & COMMAND_TYPE.COMMAND_GON) {
-                this.GON(this.getID(to), this.getID(from), card);
+                this.GON(this.getID(to), this.getID(from), card, score);
             } else if (command & COMMAND_TYPE.COMMAND_ONGON) {
-                this.ONGON(this.getID(to), "None");
+                this.ONGON(this.getID(to), "None", score);
             } else if (command & COMMAND_TYPE.COMMAND_PONGON) {
-                this.PONGON(this.getID(to), card);
+                this.PONGON(this.getID(to), card, score);
             } else if (command & COMMAND_TYPE.COMMAND_PON) {
                 this.PON(this.getID(to), this.getID(from), card);
             }
         }
+        this.updateScore();
     }
 
     private End(data: Array<{hand: string, score: number}>) {
@@ -397,19 +415,35 @@ export default class MahjongGame extends State {
         for (let i = 0; i < 4; i++) {
             console.log(data[i]);
         }
+        System.Delay(5000);
+        window.location.href = "./index.html";
+        // window.location.href = "./index.html?state=WAITING";
     }
 
-    private HU(id: number, fromId: number, card: string) {
+    private updateScore() {
+        for (let i = 0; i < 4; i++) {
+            this.scoreText[i].text = "score:   " + this.score[i];
+        }
+    }
+    private HU(id: number, fromId: number, card: string, score: number) {
         this.sea[fromId].RemoveTile(card);
         this.hu[id].AddTile(card);
+        this.score[id]     += score;
+        this.score[fromId] -= score;
     }
 
-    private ZEMO(id: number, card: string) {
+    private ZEMO(id: number, card: string, score: number) {
         this.hand[id].RemoveTile(id === 0 ? card : "None");
         this.hu[id].AddTile(card);
+        this.score[id] += score * 3;
+        for (let i = 0; i < 4; i++) {
+            if (i !== id) {
+                this.score[i] -= score;
+            }
+        }
     }
 
-    private GON(id: number, fromId: number, card: string) {
+    private GON(id: number, fromId: number, card: string, score: number) {
         this.sea[fromId].RemoveTile(card);
         for (let i = 0; i < 3; i++) {
             this.hand[id].RemoveTile(id === 0 ? card : "None");
@@ -417,18 +451,32 @@ export default class MahjongGame extends State {
         for (let i = 0; i < 4; i++) {
             this.door[id].AddTile(card);
         }
+        this.score[id]     += score;
+        this.score[fromId] -= score;
     }
 
-    private ONGON(id: number, card: string) {
+    private ONGON(id: number, card: string, score: number) {
         for (let i = 0; i < 4; i++) {
-            this.hand[id].RemoveTile(card);
-            this.door[id].AddTile(card);
+            this.hand[id].RemoveTile(id === 0 ? card : "None");
+            this.door[id].AddTile("None");
+        }
+        this.score[id] += score * 3;
+        for (let i = 0; i < 4; i++) {
+            if (i !== id) {
+                this.score[i] -= score;
+            }
         }
     }
 
-    private PONGON(id: number, card: string) {
+    private PONGON(id: number, card: string, score: number) {
         this.hand[id].RemoveTile(id === 0 ? card : "None");
         this.door[id].AddTile(card);
+        this.score[id] += score * 3;
+        for (let i = 0; i < 4; i++) {
+            if (i !== id) {
+                this.score[i] -= score;
+            }
+        }
     }
 
     private PON(id: number, fromId: number, card: string) {
