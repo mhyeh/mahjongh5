@@ -83,12 +83,10 @@ export default class JoinState extends State {
         });
 
         this.socket.on("broadcastGameStart", (playerList: string[]) => {
-            console.log(playerList);
             const players = [];
             for (let i = 0; i < 4; i++) {
                 players.push(playerList[(i + this.ID) % 4]);
             }
-
             localStorage.setItem("players", JSON.stringify(players));
             this.state.start(this.mahjongGame.key);
         });
@@ -127,8 +125,8 @@ export default class JoinState extends State {
     private *MainLoop(): IterableIterator<Promise<any>> {
         yield this.ui.Input.WaitKeyUp(Input.key.enter);
         this.ui.readyButton.visible = false;
-        this.socket.emit("ready", this.room, this.uuid, (res: string | number) => {
-            if (typeof res === "string") {
+        this.socket.emit("ready", this.room, this.uuid, (res: number) => {
+            if (res === -1) {
                 window.location.href = "./index.html";
                 return;
             }
