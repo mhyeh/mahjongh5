@@ -58,7 +58,7 @@ export default class ChangeCardEffect extends Effect {
                         });
                     });
                 }
-            } else if (index === 1) {
+            } else if (index === 2) {
                 this.part2[0] = this.game.add.tween(this.animCard[0]).to({ x: 150  }, 1000, Phaser.Easing.Linear.None, false);
                 this.part2[1] = this.game.add.tween(this.animCard[1]).to({ y: 1400 }, 1000, Phaser.Easing.Linear.None, false);
                 this.part2[2] = this.game.add.tween(this.animCard[2]).to({ x: 1850 }, 1000, Phaser.Easing.Linear.None, false);

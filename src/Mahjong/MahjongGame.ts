@@ -98,7 +98,7 @@ export default class MahjongGame extends State {
 
         const playerList = JSON.parse(localStorage.getItem("players"));
         for (let i = 0; i < 4; i++) {
-            this.name[this.getID(i)].text += playerList[this.getID(i)];
+            this.name[i].text += playerList[i];
             this.scoreText[i].text = "score:   " + this.score[i];
         }
 
@@ -123,7 +123,7 @@ export default class MahjongGame extends State {
         this.socket.on("success", (from: number, command: number, card: string, score: number) => this.Success(from, command, card, score));
         this.socket.on("broadcastCommand", (from: number, to: number, command: number, card: string, score: number) => this.BroadcastSuccess(from, to, command, card, score));
 
-        this.socket.on("end", (data: Array<{hand: string, score: number}>) => this.End(data));
+        this.socket.on("end", (data: string) => this.End(data));
     }
 
     private getID(id: number) {
@@ -374,7 +374,6 @@ export default class MahjongGame extends State {
     }
 
     private Success(from: number, command: number, card: string, score: number) {
-        console.log("success", from, command, card, score);
         if (command & COMMAND_TYPE.COMMAND_HU) {
             this.HU(0, this.getID(from), card, score);
         } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
@@ -391,7 +390,6 @@ export default class MahjongGame extends State {
     }
 
     private BroadcastSuccess(from: number, to: number, command: number, card: string, score: number) {
-        console.log("broadcastCommand", from, to, command, card, score);
         if (this.getID(to) !== 0) {
             if (command & COMMAND_TYPE.COMMAND_HU) {
                 this.HU(this.getID(to), this.getID(from), card, score);
@@ -410,18 +408,20 @@ export default class MahjongGame extends State {
         this.updateScore();
     }
 
-    private End(data: Array<{hand: string, score: number}>) {
+    private async End(data: string) {
+        const gameResult = JSON.parse(data);
         console.log("end");
         for (let i = 0; i < 4; i++) {
-            console.log(data[i]);
+            console.log(gameResult[i]);
         }
-        System.Delay(5000);
-        window.location.href = "./index.html";
+        await System.Delay(5000);
+        // window.location.href = "./index.html";
         // window.location.href = "./index.html?state=WAITING";
     }
 
     private updateScore() {
         for (let i = 0; i < 4; i++) {
+            console.log(this.score[i]);
             this.scoreText[i].text = "score:   " + this.score[i];
         }
     }
