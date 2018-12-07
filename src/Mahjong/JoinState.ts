@@ -58,17 +58,38 @@ export default class JoinState extends State {
         this.ui.Input.AddButton(this.ui.readyButton, Input.key.enter, undefined);
         this.ui.Refresh();
 
-        this.room = localStorage.getItem("room");
         this.uuid = localStorage.getItem("uuid");
-        this.socket.emit("auth", this.room, this.uuid, (message?: string) => {
-            if (message !== "") {
-                window.location.href = "./index.html";
-            }
-        });
+        this.room = localStorage.getItem("room");
+
+        const state = localStorage.getItem("state");
 
         const list = JSON.parse(localStorage.getItem("players"));
         for (let i = 0; i < 4; i++) {
             this.name[i].text = list[i];
+        }
+
+        this.socket.emit("getReadyPlayer", this.room, (nameList: string[]) => {
+            for (const name of nameList) {
+                let index = 0;
+                for (let i = 0; i < 4; i++) {
+                    if (list[i] === name) {
+                        index = i;
+                    }
+                }
+                this.nameBlock[index].tint = 0XFFFF33;
+            }
+        });
+
+        if (state === "2") {
+            this.ui.readyButton.visible = false;
+            this.socket.emit("getID", this.uuid, this.room, (res: number) => {
+                if (res === -1) {
+                    window.location.href = "./index.html";
+                    return;
+                }
+                this.ID = res;
+                localStorage.setItem("ID", res.toString());
+            });
         }
 
         this.socket.on("broadcastReady", (name: string) => {

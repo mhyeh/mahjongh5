@@ -13,41 +13,59 @@
 	<script>
 		const socket = io("http://140.118.127.157:3000");
 		window.onload = () => {
-			if (window.location.href.indexOf("state=WAITING") === -1) {
-				$("#waiting").hide();
-				$("#login").show();
-			} else {
-				$("#waiting").show();
-				$("#login").hide();
-			}
+			$("#login").show();
+			$("#waiting").hide();
 		};
 		function join() {
 			const name = $("#name").val();
-			if (name === "") return;
+			if (name === "") {
+				return;
+			}
+
 			localStorage.setItem("name", name);
 
 			socket.emit("join", name, (uuid, err) => {
 				if (err) {
 					console.log("this name was be used");
+					$("#login").show();
+					$("#waiting").hide();
 					return;
 				}
 				localStorage.setItem("uuid", uuid);
 				$("#login").hide();
 				$("#waiting").show();
 			});
-
 		};
 
-		socket.on("auth", () => {
-			if (window.location.href.indexOf("state=WAITING") !== -1) {
-				const uuid = localStorage.getItem("uuid");
+		function updateInfo() {
+			const uuid = localStorage.getItem("uuid");
+			socket.emit("getRoomInfo", uuid, (room, playerList, err) => {
+				localStorage.setItem("room", room);
+				localStorage.setItem("players", JSON.stringify(playerList));
+				window.location = "./game.html";
+			})
+		}
 
-				socket.emit("authWaiting", uuid, (message) => {
-					if (message !== "") {
-						window.location.href = "./index.html";
-					}
-				});
+		socket.on("auth", () => {
+			const uuid = localStorage.getItem("uuid");
+			const room = localStorage.getItem("room");
+			if (uuid === undefined) {
+				$("#login").show();
+				$("#waiting").hide();
+				return;
 			}
+			if (room === undefined) {
+				room = "";
+			}
+			console.log("auth")
+			socket.emit("auth", uuid, room, (state) => {
+				if (state === 0) {
+					$("#login").hide();
+					$("#waiting").show();
+				} else if (state !== -1) {
+					updateInfo()
+				}
+			});
 		});
 
 		socket.on("readyToStart", (roomName, playerList) => {

@@ -12,8 +12,9 @@ import ChangeCardEffect from "./effect/ChangeCardEffect";
 import Timer from "mahjongh5/component/Timer";
 import JoinState from "./JoinState";
 import * as io from "socket.io-client";
+import Game from "mahjongh5/Game";
 
-export default function MahjingStart() {
+export default function MahjongStart() {
     const GAME_WIDTH  = 2000;
     const GAME_HEIGHT = 1500;
     let renderer = Phaser.CANVAS;
@@ -26,15 +27,35 @@ export default function MahjingStart() {
     if (window.location.href.indexOf("render=CANVAS") !== -1) {
         renderer = Phaser.CANVAS;
     }
+    let isPlaying = false;
 
     const socket = io.connect("http://140.118.127.157:3000");
-    Mahjongh5.StartGame((game) => {
+    socket.on("auth", () => {
+        const uuid = localStorage.getItem("uuid");
+        const room = localStorage.getItem("room");
+        socket.emit("auth", uuid, room, (state: number) => {
+            console.log(state);
+            localStorage.setItem("state", state.toString());
+            if (state === -1 || state === 0) {
+                window.location.href = "./index.html";
+            } else if (state === 4) {
+                isPlaying = true;
+            }
+            Mahjongh5.StartGame(init, GAME_WIDTH, GAME_HEIGHT, renderer, "game");
+        });
+    });
+
+    const init = (game: Game) => {
         // game setting
         game.assets     = Assets;
         game.loadState  = new LoadState(game);
         const joinState = new JoinState(game);
         const mahjong   = new MahjongGame(game);
-        game.gameStates.push(joinState);
+        if (isPlaying) {
+            game.gameStates.push(mahjong);
+        } else {
+            game.gameStates.push(joinState);
+        }
         if (window.location.href.indexOf("lang=TW") !== -1) {
             game.language = "TW";
             console.log("set language to TW");
@@ -275,5 +296,5 @@ export default function MahjingStart() {
             mahjong.commandDialog   = commandDialog;
         });
 
-    }, GAME_WIDTH, GAME_HEIGHT, renderer, "game");
+    };
 }
