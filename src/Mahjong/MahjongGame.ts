@@ -514,8 +514,7 @@ export default class MahjongGame extends State {
             console.log(gameResult[i]);
         }
         await System.Delay(5000);
-        // window.location.href = "./index.html";
-        // window.location.href = "./index.html?state=WAITING";
+        window.location.href = "./index.html";
     }
 
     private updateScore() {

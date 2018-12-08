@@ -13,6 +13,10 @@
 	<script>
 		const socket = io("http://140.118.127.157:3000");
 		window.onload = () => {
+			name = localStorage.getItem("name");
+			if (name !== undefined && name !== "null") {
+				$("#name").val(name);
+			}
 			$("#login").show();
 			$("#waiting").hide();
 		};
