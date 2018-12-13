@@ -22,6 +22,7 @@ export default class MahjongGame extends State {
     public door: CommandTileList[];
     public hand: CommandTileList[];
     public hu:   CommandTileList[];
+    public draw: CommandTileList;
 
     public choseLackDialog: ChoseLackDialog;
     public commandDialog:   CommandDialog;
@@ -95,6 +96,7 @@ export default class MahjongGame extends State {
         this.ui.Refresh();
 
         this.id = Number(localStorage.getItem("ID"));
+        console.log(this.id);
 
         const playerList = JSON.parse(localStorage.getItem("players"));
         for (let i = 0; i < 4; i++) {
@@ -133,9 +135,9 @@ export default class MahjongGame extends State {
             this.socket.emit("getHandCount", room, (handCount: number[]) => {
                 if (typeof handCount[0] !== "undefined") {
                     for (let i = 0; i < 4; i++) {
-                        if (this.getID(i) !== 0) {
-                            while (this.hand[i].tileCount > handCount[this.getID(i)]) {
-                                this.hand[i].RemoveTile("None");
+                        if (i !== 0) {
+                            while (this.hand[this.getID(i)].tileCount > handCount[i]) {
+                                this.hand[this.getID(i)].RemoveTile("None");
                             }
                         }
                     }
@@ -146,25 +148,26 @@ export default class MahjongGame extends State {
             });
             this.socket.emit("getDoor", uuid, room, (door: string[][], inVisibleCount: number[], err: boolean) => {
                 if (!err) {
-                    console.log(door);
+                    console.log(door, inVisibleCount);
                     for (let i = 0; i < 4; i++) {
-                        if (door[this.getID(i)] != null) {
-                            for (const card of door[this.getID(i)]) {
-                                this.door[i].AddTile(card);
+                        if (door[i] != null) {
+                            for (const card of door[i]) {
+                                this.door[this.getID(i)].AddTile(card);
                             }
                         }
-                        while (inVisibleCount[this.getID(i)]--) {
-                            this.door[i].AddTile("None");
+                        while (inVisibleCount[i]--) {
+                            this.door[this.getID(i)].AddTile("None");
                         }
                     }
                 }
             });
             this.socket.emit("getSea", room, (sea: string[][], err: boolean) => {
                 if (!err) {
+                    console.log(sea);
                     for (let i = 0; i < 4; i++) {
-                        if (sea[this.getID(i)] != null) {
-                            for (const card of sea[this.getID(i)]) {
-                                this.sea[i].AddTile(card);
+                        if (sea[i] != null) {
+                            for (const card of sea[i]) {
+                                this.sea[this.getID(i)].AddTile(card);
                             }
                         }
                     }
@@ -172,10 +175,11 @@ export default class MahjongGame extends State {
             });
             this.socket.emit("getHu", room, (hu: string[][], err: boolean) => {
                 if (!err) {
+                    console.log(hu);
                     for (let i = 0; i < 4; i++) {
-                        if (hu[this.getID(i)] != null) {
-                            for (const card of hu[this.getID(i)]) {
-                                this.hu[i].AddTile(card);
+                        if (hu[i] != null) {
+                            for (const card of hu[i]) {
+                                this.hu[this.getID(i)].AddTile(card);
                             }
                         }
                     }
@@ -183,10 +187,9 @@ export default class MahjongGame extends State {
             });
             this.socket.emit("getCurrentIdx", room, (playerIdx: number) => {
                 if (playerIdx !== -1) {
+                    this.arrow[this.getID(playerIdx)].tint = 0xFFFFFF;
                     for (let i = 0; i < 4; i++) {
-                        if (this.getID(playerIdx) === i) {
-                            this.arrow[i].tint = 0xFFFFFF;
-                        } else {
+                        if (i !== this.getID(playerIdx)) {
                             this.arrow[i].tint = 0x808080;
                         }
                     }
@@ -195,7 +198,7 @@ export default class MahjongGame extends State {
             this.socket.emit("getScore", room, (score: number[]) => {
                 if (typeof score[0] !== "undefined") {
                     for (let i = 0; i < 4; i++) {
-                        this.score[i] = score[this.getID(i)];
+                        this.score[this.getID(i)] = score[i];
                     }
                 }
             });
@@ -212,7 +215,7 @@ export default class MahjongGame extends State {
         this.socket.on("lack", (color: number, time: number) => this.ChooseLack(color, time));
         this.socket.on("afterLack", (data: number[]) => this.AfterLack(data));
 
-        this.socket.on("draw", (card: string) => this.hand[0].AddTile(card));
+        this.socket.on("draw", (card: string) => this.draw.AddTile(card));
         this.socket.on("broadcastDraw", (id: number) => this.BroadcastDraw(id));
 
         this.socket.on("throw", async (card: string, time: number) => this.Throw(card, time));
@@ -221,6 +224,16 @@ export default class MahjongGame extends State {
         this.socket.on("command", async (cardMap: string, command: COMMAND_TYPE, time: number) => this.Command(cardMap, command, time));
         this.socket.on("success", (from: number, command: number, card: string, score: number) => this.Success(from, command, card, score));
         this.socket.on("broadcastCommand", (from: number, to: number, command: number, card: string, score: number) => this.BroadcastSuccess(from, to, command, card, score));
+        this.socket.on("robGon", (id: number, tile: string) => {
+            for (let i = 0; i < 4; i++) {
+                if (this.getID(id) === i) {
+                    if (i === 0) {
+                        this.clearDraw();
+                    }
+                    this.hand[i].RemoveTile(i === 0 ? tile : "None");
+                }
+            }
+        });
 
         this.socket.on("end", (data: string) => this.End(data));
     }
@@ -235,9 +248,9 @@ export default class MahjongGame extends State {
         const defaultChange = System.DelayValue(time, defaultCard);
         this.ui.checkButton.visible = true;
 
-        this.timer.timeStart(time);
+        this.timer.Play(time);
         const changedCard = await Promise.race([this.ChoseLackCard(), defaultChange]);
-        this.timer.timeStop();
+        this.timer.ForceStop();
 
         this.ui.checkButton.visible = false;
         for (let i = 0; i < 3; i++) {
@@ -334,9 +347,9 @@ export default class MahjongGame extends State {
         this.choseLackDialog.Show();
         const defaultColor = System.DelayValue(time, color);
 
-        this.timer.timeStart(time);
+        this.timer.Play(time);
         const lackColor = await Promise.race([this.ui.Input.WaitKeyUp(Input.key.lack), defaultColor]);
-        this.timer.timeStop();
+        this.timer.ForceStop();
 
         this.choseLackDialog.Hide();
         this.socket.emit("chooseLack", lackColor);
@@ -367,18 +380,22 @@ export default class MahjongGame extends State {
         this.hand[0].EnableAll();
         const defaultCard = System.DelayValue(time, card);
 
-        this.timer.timeStart(time);
-        const throwCard = await Promise.race([this.hand[0].getClickCardID(), defaultCard]);
-        this.timer.timeStop();
-
-        this.socket.emit("throwCard", throwCard);
+        this.timer.Play(time);
+        const throwCard = await Promise.race([this.hand[0].getClickCardID(), this.draw.getClickCardID(), defaultCard]);
+        this.timer.ForceStop();
         this.hand[0].DisableAll();
+        this.socket.emit("throwCard", throwCard);
     }
 
     private BroadcastThrow(id: number, card: string) {
+        for (let i = 0; i < 4; i++) {
+            this.arrow[i].tint = 0x808080;
+        }
         if (this.getID(id) === 0) {
-            this.hand[this.getID(id)].RemoveTile(card);
+            this.clearDraw();
+            this.hand[0].RemoveTile(card);
             this.hand[0].DisableAll();
+            this.draw.position = new Phaser.Point(this.hand[0].x + 55 * this.hand[0].tileCount + 20, 1400);
         } else {
             this.hand[this.getID(id)].RemoveTile("None");
         }
@@ -387,6 +404,7 @@ export default class MahjongGame extends State {
 
     private async Command(cardMap: string, command: COMMAND_TYPE, time: number) {
         const json = JSON.parse(cardMap);
+        console.log(json);
         const map: Map<COMMAND_TYPE, string[]> = new Map<COMMAND_TYPE, string[]>();
         for (const row of json) {
             map.set(row.Key, row.Value);
@@ -403,27 +421,33 @@ export default class MahjongGame extends State {
             this.commandDialog.gon.enable = true;
         }
 
+        this.hand[0].DisableAll();
         for (const [key, value] of map) {
             for (const id of value) {
                 this.hand[0].Enable(id);
+                this.draw.Enable(id);
             }
         }
 
         const defaultCommand = System.DelayValue(time, { cmd: COMMAND_TYPE.NONE, card: "" });
 
-        this.timer.timeStart(time);
+        this.timer.Play(time);
         const result = await Promise.race([this.ChooseCommand(map, command), defaultCommand]);
-        this.timer.timeStop();
+        this.timer.ForceStop();
 
+        this.clearDraw();
         this.hand[0].DisableAll();
-        this.socket.emit("sendCommand", JSON.stringify({Command: result.cmd, Card: result.card, Score: 0}));
         this.commandDialog.Hide();
+        this.socket.emit("sendCommand", JSON.stringify({Command: result.cmd, Tile: result.card, Score: 0}));
     }
 
     private async ChooseCommand(cards: Map<COMMAND_TYPE, string[]>, commands: COMMAND_TYPE): Promise<{cmd: COMMAND_TYPE, card: string}> {
         const action = await this.ui.Input.WaitKeyUp(Input.key.command);
         let resultCard = "";
         let resultCommand = COMMAND_TYPE.NONE;
+        if (action === ButtonKey.None) {
+            return {cmd: COMMAND_TYPE.NONE, card: resultCard};
+        }
         if (action === ButtonKey.Hu) {
             if (commands & COMMAND_TYPE.COMMAND_HU) {
                 resultCommand = COMMAND_TYPE.COMMAND_HU;
@@ -443,10 +467,12 @@ export default class MahjongGame extends State {
                 this.commandDialog.ongon.visible  = true;
 
                 this.hand[0].DisableAll();
+                this.draw.DisableAll();
                 for (const [key, value] of cards) {
                     if (key === COMMAND_TYPE.COMMAND_ONGON || key === COMMAND_TYPE.COMMAND_PONGON) {
                         for (const id of value) {
                             this.hand[0].Enable(id);
+                            this.draw.EnableAll();
                         }
                     }
                 }
@@ -463,7 +489,7 @@ export default class MahjongGame extends State {
             }
 
             if (cards.get(resultCommand).length > 1) {
-                resultCard = await this.hand[0].getClickCardID();
+                resultCard = await Promise.race([this.hand[0].getClickCardID(), this.draw.getClickCardID()]);
             } else {
                 resultCard = cards.get(resultCommand)[0];
             }
@@ -473,6 +499,7 @@ export default class MahjongGame extends State {
     }
 
     private Success(from: number, command: number, card: string, score: number) {
+        this.clearDraw();
         if (command & COMMAND_TYPE.COMMAND_HU) {
             this.HU(0, this.getID(from), card, score);
         } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
@@ -486,6 +513,8 @@ export default class MahjongGame extends State {
         } else if (command & COMMAND_TYPE.COMMAND_PON) {
             this.PON(0, this.getID(from), card);
         }
+        console.log(this.hand[0].tileCount);
+        this.draw.position = new Phaser.Point(this.hand[0].x + 55 * this.hand[0].tileCount + 20, 1400);
     }
 
     private BroadcastSuccess(from: number, to: number, command: number, card: string, score: number) {
@@ -509,12 +538,14 @@ export default class MahjongGame extends State {
 
     private async End(data: string) {
         const gameResult = JSON.parse(data);
+        console.log(gameResult);
         console.log("end");
         for (let i = 0; i < 4; i++) {
-            console.log(gameResult[i]);
+            this.hand[this.getID(i)].SetImmediate(gameResult[i].Hand);
+            this.door[this.getID(i)].SetImmediate(gameResult[i].Door);
         }
         await System.Delay(5000);
-        window.location.href = "./index.html";
+        // window.location.href = "./index.html";
     }
 
     private updateScore() {
@@ -555,7 +586,7 @@ export default class MahjongGame extends State {
     private ONGON(id: number, card: string, score: number) {
         for (let i = 0; i < 4; i++) {
             this.hand[id].RemoveTile(id === 0 ? card : "None");
-            this.door[id].AddTile("None");
+            this.door[id].AddTile(id === 0 ? card : "None");
         }
         this.score[id] += score * 3;
         for (let i = 0; i < 4; i++) {
@@ -584,5 +615,14 @@ export default class MahjongGame extends State {
         for (let i = 0; i < 3; i++) {
             this.door[id].AddTile(card);
         }
+    }
+
+    private clearDraw() {
+        if (this.draw.tileCount > 0) {
+            const tile = this.draw.tiles[0].ID;
+            this.draw.RemoveTile(tile);
+            this.hand[0].AddTile(tile);
+        }
+        this.hand[0].DisableAll();
     }
 }

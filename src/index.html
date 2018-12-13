@@ -11,7 +11,9 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 	<script>
-		const socket = io("http://140.118.127.157:3000");
+		const socket = io("http://140.118.127.157:3000", {
+			transports: ["websocket"]
+		});
 		window.onload = () => {
 			name = localStorage.getItem("name");
 			if (name !== undefined && name !== "null") {

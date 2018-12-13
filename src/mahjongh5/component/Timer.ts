@@ -1,9 +1,10 @@
+import Effect from "./Effect";
 import NumberFormatter from "mahjongh5/ui/NumberFormatter";
 import * as System from "mahjongh5/System";
 
 const SEC = 1000;
 
-export default class Timer {
+export default class Timer extends Effect {
     private enableTint:  number;
     private disableTint: number;
 
@@ -13,24 +14,25 @@ export default class Timer {
         return this.timer.textDisplayer;
     }
 
-    constructor(timer: NumberFormatter<Phaser.Text>, enableTint: number = 0xFFFFFF, disableTint: number = 0xFFFFFF) {
+    constructor(game: Phaser.Game, timer: NumberFormatter<Phaser.Text>, enableTint: number = 0xFFFFFF, disableTint: number = 0xFFFFFF, parent?: PIXI.DisplayObjectContainer) {
+        super(game, parent);
         this.timer = timer;
         this.enableTint  = enableTint;
         this.disableTint = disableTint;
-        this.Text.tint = this.disableTint;
+        this.Text.tint   = this.disableTint;
     }
 
-    public async timeStart(time: number): Promise<void> {
+    protected *RunEffect(time: number): IterableIterator<Promise<void>> {
         this.timer.value = time / SEC;
-        this.Text.tint = this.enableTint;
+        this.Text.tint   = this.enableTint;
         while (this.timer.value > 0) {
-            await System.Delay(SEC);
+            yield System.Delay(SEC);
             this.timer.value--;
         }
     }
 
-    public timeStop() {
+    protected async EndEffect(): Promise<void> {
         this.timer.value = 0;
-        this.Text.tint = this.disableTint;
+        this.Text.tint   = this.disableTint;
     }
 }

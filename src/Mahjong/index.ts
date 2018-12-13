@@ -29,7 +29,9 @@ export default function MahjongStart() {
     }
     let isPlaying = false;
 
-    const socket = io.connect("http://140.118.127.157:3000");
+    const socket = io.connect("http://140.118.127.157:3000", {
+        transports: ["websocket"],
+    });
     socket.on("auth", () => {
         const uuid = localStorage.getItem("uuid");
         const room = localStorage.getItem("room");
@@ -160,6 +162,8 @@ export default function MahjongStart() {
                 score.push(game.add.text(0, 0, "score:   ", { font: "32px Arial", fill: "#FFFFFF" }));
                 score[i].anchor.set(1, 0.5);
             }
+            const draw = new CommonTileList(game, 0, tileTable, undefined, 50, 75, 0, true, 1);
+            draw.TileAnchor = new Phaser.Point(0.5, 0.5);
 
             hand[0].position  = new Phaser.Point(700, 1400);
             door[0].position  = new Phaser.Point(700, 1260);
@@ -168,6 +172,7 @@ export default function MahjongStart() {
             lack[0].position  = new Phaser.Point(550, 1350);
             name[0].position  = new Phaser.Point(620, 1410);
             score[0].position = new Phaser.Point(620, 1450);
+            draw.position     = new Phaser.Point(hand[0].x + 55 * hand[0].tileCount + 20, 1400);
 
             hand[1].position  = new Phaser.Point(1850, 100);
             door[1].position  = new Phaser.Point(1710, 100);
@@ -202,7 +207,7 @@ export default function MahjongStart() {
             arrow[2].position = new Phaser.Point(game.width / 2, game.height / 2 - 70);
             arrow[3].position = new Phaser.Point(game.width / 2 - 90, game.height / 2);
 
-            const timer = new Timer(new NumberFormatter(game.add.text(game.width / 2, game.height / 2, "0", { font: "100px Arial", fill: "#FFFFFF" })), undefined, 0x808080);
+            const timer = new Timer(game, new NumberFormatter(game.add.text(game.width / 2, game.height / 2, "0", { font: "100px Arial", fill: "#FFFFFF" })), undefined, 0x808080);
             timer.Text.anchor.set(0.5);
 
             const checkButton = new Button(game, 1500, 1400, Assets.button.check.key);
@@ -269,7 +274,7 @@ export default function MahjongStart() {
                 dialog.ongon.anchor.set(0.5, 0.5);
                 dialog.ongon.stateTint.down = 0x707070;
             });
-            commandDialog.position = new Phaser.Point(1400, 1310);
+            commandDialog.position = new Phaser.Point(1450, 1350);
             commandDialog.backgroundAlpha = 0;
 
             mahjong.socket = socket;
@@ -280,6 +285,7 @@ export default function MahjongStart() {
             mahjong.door = door;
             mahjong.hand = hand;
             mahjong.hu   = hu;
+            mahjong.draw = draw;
 
             mahjong.lack      = lack;
             mahjong.name      = name;
