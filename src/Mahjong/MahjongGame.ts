@@ -422,6 +422,7 @@ export default class MahjongGame extends State {
         }
 
         this.hand[0].DisableAll();
+        this.draw.DisableAll();
         for (const [key, value] of map) {
             for (const id of value) {
                 this.hand[0].Enable(id);
