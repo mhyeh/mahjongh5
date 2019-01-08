@@ -102,15 +102,15 @@ export default abstract class TileList<TileType extends Tile> extends Phaser.Gro
         }
     }
 
-    public async getClickCardIndex(): Promise<number> {
+    public async getClickTileIndex(): Promise<number> {
         const uuid = await this.Input.WaitKeyUp(Input.key.Throw);
-        const card = this.tiles.findIndex((value) => value.uuid === uuid.toString());
-        return card;
+        const tile = this.tiles.findIndex((value) => value.uuid === uuid.toString());
+        return tile;
     }
 
-    public async getClickCardID(): Promise<string> {
+    public async getClickTileID(): Promise<string> {
         const uuid = await this.Input.WaitKeyUp(Input.key.Throw);
-        const card = this.tiles.find((value) => value.uuid === uuid.toString());
-        return card.ID;
+        const tile = this.tiles.find((value) => value.uuid === uuid.toString());
+        return tile.ID;
     }
 }

@@ -1,5 +1,5 @@
-import ChangeCardEffect from "./effect/ChangeCardEffect";
+import changeTileEffect from "./effect/ChangeTileEffect";
 
 export default class EffectController {
-    public changeCardEffect: ChangeCardEffect;
+    public changeTileEffect: changeTileEffect;
 }

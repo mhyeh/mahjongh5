@@ -23,6 +23,7 @@ export const image = {
     background: { type: "image", key: "backgorund", args: [require("assets/Mahjong/background.png")] },
     arrow: { type: "image", key: "", args: [require("assets/Mahjong/arrow.png")] },
     name_block: { type: "image", key: "", args: [require("assets/Mahjong/name_block.png")] },
+    avatar: { type: "image", key: "", args: [require("assets/Mahjong/avatar.png")] },
 };
 
 export const tiles = {

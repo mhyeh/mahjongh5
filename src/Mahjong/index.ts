@@ -8,11 +8,12 @@ import Button from "mahjongh5/ui/Button";
 import ChoseLackDialog from "./ChoseLackDialog";
 import CommandDialog from "./CommandDialog";
 import NumberFormatter from "mahjongh5/ui/NumberFormatter";
-import ChangeCardEffect from "./effect/ChangeCardEffect";
+import changeTileEffect from "./effect/ChangeTileEffect";
 import Timer from "mahjongh5/component/Timer";
 import JoinState from "./JoinState";
 import * as io from "socket.io-client";
 import Game from "mahjongh5/Game";
+import InfoDialog from "./InfoDialog";
 
 export default function MahjongStart() {
     const GAME_WIDTH  = 2000;
@@ -71,14 +72,14 @@ export default function MahjongStart() {
         game.loadState.onCreate.add((load: LoadState) => {
             // 這裡使用的資源必須要是preload的喔
             // load.separateProgress = true;
-            const loadBar = game.add.image(game.world.centerX, game.world.centerY, Assets.preload.loadBar.key);
-            loadBar.x -= loadBar.width / 2;
-            loadBar.anchor.set(0, 0.5);
+            // const loadBar = game.add.image(game.world.centerX, game.world.centerY, Assets.preload.loadBar.key);
+            // loadBar.x -= loadBar.width / 2;
+            // loadBar.anchor.set(0, 0.5);
             const loadText = game.add.text(game.world.centerX, game.world.height * 0.8, "", { font: "24px Arial", fill: "#FFFFFF" });
             loadText.anchor.set(0.5, 0.5);
             const loadProgress = game.add.text(game.world.centerX, game.world.height * 0.9, "", { font: "24px Arial", fill: "#FFFFFF" });
             loadProgress.anchor.set(0.5, 0.5);
-            load.SetPreloadSprite(loadBar, 0);
+            // load.SetPreloadSprite(loadBar, 0);
             load.SetMessageText(loadText);
             load.onProgressChanged.add((sender: any, value: number) => loadProgress.text = (value * 100).toFixed(3) + "%");
         });
@@ -121,17 +122,17 @@ export default function MahjongStart() {
             const bg = game.add.image(0, 0, Assets.image.background.key);
             bg.scale.set(game.width, game.height);
 
-            const remainCard = game.add.text(10, 10, "剩餘張數: 56", { font: "32px Arial", fill: "#FFFFFF" });
+            const remainTile = game.add.text(10, 10, "剩餘張數: 56", { font: "32px Arial", fill: "#FFFFFF" });
 
             const tileTable = new ImageTileTable(game.cache.getJSON(Assets.tiles.tiles_config.key), Assets.tiles.tiles.key);
-            const sea   = [];
-            const hand  = [];
-            const door  = [];
-            const hu    = [];
-            const arrow = [];
-            const lack  = [];
-            const name  = [];
-            const score = [];
+            const sea    = [];
+            const hand   = [];
+            const door   = [];
+            const hu     = [];
+            const arrow  = [];
+            const avatar = [];
+            const name   = [];
+            const score  = [];
             for (let i = 0; i < 4; i++) {
                 hand.push(new CommonTileList(game, 13, tileTable, undefined, 50, 75, i, i === 0, 16));
                 door.push(new CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false,   16));
@@ -150,11 +151,10 @@ export default function MahjongStart() {
                 arrow[i].height = 30;
                 arrow[i].tint   = 0x808080;
 
-                lack.push(game.add.image(0, 0, Assets.button.char.key));
-                lack[i].anchor = new Phaser.Point(0.5, 0.5);
-                lack[i].width  = 50;
-                lack[i].height = 50;
-                lack[i].visible = false;
+                avatar.push(new Button(game, 0, 0, Assets.image.avatar.key));
+                avatar[i].anchor = new Phaser.Point(0.5, 0.5);
+                avatar[i].width  = 50;
+                avatar[i].height = 50;
 
                 name.push(game.add.text(0, 0, "ID:   ", { font: "32px Arial", fill: "#FFFFFF" }));
                 name[i].anchor.set(1, 0.5);
@@ -165,42 +165,42 @@ export default function MahjongStart() {
             const draw = new CommonTileList(game, 0, tileTable, undefined, 50, 75, 0, true, 1);
             draw.TileAnchor = new Phaser.Point(0.5, 0.5);
 
-            hand[0].position  = new Phaser.Point(700, 1400);
-            door[0].position  = new Phaser.Point(700, 1260);
-            hu[0].position    = new Phaser.Point(700, 1170);
-            sea[0].position   = new Phaser.Point(730, 950);
-            lack[0].position  = new Phaser.Point(550, 1350);
-            name[0].position  = new Phaser.Point(620, 1410);
-            score[0].position = new Phaser.Point(620, 1450);
-            draw.position     = new Phaser.Point(hand[0].x + 55 * hand[0].tileCount + 20, 1400);
+            hand[0].position    = new Phaser.Point(700, 1400);
+            door[0].position    = new Phaser.Point(700, 1260);
+            hu[0].position      = new Phaser.Point(700, 1170);
+            sea[0].position     = new Phaser.Point(730, 950);
+            avatar[0].position  = new Phaser.Point(450, 1360);
+            name[0].position    = new Phaser.Point(620, 1410);
+            score[0].position   = new Phaser.Point(620, 1450);
+            draw.position       = new Phaser.Point(hand[0].x + 55 * hand[0].tileCount + 20, 1400);
 
-            hand[1].position  = new Phaser.Point(1850, 100);
-            door[1].position  = new Phaser.Point(1710, 100);
-            hu[1].position    = new Phaser.Point(1620, 100);
-            sea[1].position   = new Phaser.Point(1400, 400);
-            lack[1].position  = new Phaser.Point(1650, 1080);
-            name[1].position  = new Phaser.Point(1900, 1060);
-            score[1].position = new Phaser.Point(1900, 1100);
+            hand[1].position    = new Phaser.Point(1850, 100);
+            door[1].position    = new Phaser.Point(1710, 100);
+            hu[1].position      = new Phaser.Point(1620, 100);
+            sea[1].position     = new Phaser.Point(1400, 400);
+            avatar[1].position  = new Phaser.Point(1850, 1180);
+            name[1].position    = new Phaser.Point(1900, 1060);
+            score[1].position   = new Phaser.Point(1900, 1100);
 
-            hand[2].position  = new Phaser.Point(490,  100);
-            door[2].position  = new Phaser.Point(490,  240);
-            hu[2].position    = new Phaser.Point(490,  330);
-            sea[2].position   = new Phaser.Point(685,  550);
-            lack[2].position  = new Phaser.Point(1500, 60);
-            name[2].position  = new Phaser.Point(1450, 120);
-            score[2].position = new Phaser.Point(1450, 160);
-            name[2].anchor.x  = 0;
-            score[2].anchor.x = 0;
+            hand[2].position    = new Phaser.Point(490,  100);
+            door[2].position    = new Phaser.Point(490,  240);
+            hu[2].position      = new Phaser.Point(490,  330);
+            sea[2].position     = new Phaser.Point(685,  550);
+            avatar[2].position  = new Phaser.Point(1500, 60);
+            name[2].position    = new Phaser.Point(1450, 120);
+            score[2].position   = new Phaser.Point(1450, 160);
+            name[2].anchor.x    = 0;
+            score[2].anchor.x   = 0;
 
-            hand[3].position  = new Phaser.Point(150, 400);
-            door[3].position  = new Phaser.Point(290, 400);
-            hu[3].position    = new Phaser.Point(380, 400);
-            sea[3].position   = new Phaser.Point(600, 430);
-            lack[3].position  = new Phaser.Point(90,  250);
-            name[3].position  = new Phaser.Point(80, 310);
-            score[3].position = new Phaser.Point(80, 350);
-            name[3].anchor.x  = 0;
-            score[3].anchor.x = 0;
+            hand[3].position    = new Phaser.Point(150, 400);
+            door[3].position    = new Phaser.Point(290, 400);
+            hu[3].position      = new Phaser.Point(380, 400);
+            sea[3].position     = new Phaser.Point(600, 430);
+            avatar[3].position  = new Phaser.Point(90,  250);
+            name[3].position    = new Phaser.Point(80,  310);
+            score[3].position   = new Phaser.Point(80,  350);
+            name[3].anchor.x    = 0;
+            score[3].anchor.x   = 0;
 
             arrow[0].position = new Phaser.Point(game.width / 2, game.height / 2 + 70);
             arrow[1].position = new Phaser.Point(game.width / 2 + 90, game.height / 2);
@@ -277,9 +277,27 @@ export default function MahjongStart() {
             commandDialog.position = new Phaser.Point(1450, 1350);
             commandDialog.backgroundAlpha = 0;
 
+            const infoDialog = [];
+            for (let i = 0; i < 4; i++) {
+                infoDialog.push(new InfoDialog(game, (dialog: InfoDialog) => {
+                    dialog.lack     = game.add.image(0, 0);
+                    dialog.scoreLog = game.add.text(0, 0);
+
+                    dialog.lack.anchor = new Phaser.Point(0.5, 0.5);
+                    dialog.lack.position = new Phaser.Point(50, 50);
+                    dialog.lack.width  = 15;
+                    dialog.lack.height = 15;
+                }));
+                infoDialog[i].backgroundAlpha = 0;
+            }
+            infoDialog[0].position = new Phaser.Point(300,  1200);
+            infoDialog[1].position = new Phaser.Point(1350, 1100);
+            infoDialog[2].position = new Phaser.Point(1350, 200);
+            infoDialog[3].position = new Phaser.Point(200,  150);
+
             mahjong.socket = socket;
 
-            mahjong.remainCard = remainCard;
+            mahjong.remainTile = remainTile;
 
             mahjong.sea  = sea;
             mahjong.door = door;
@@ -287,19 +305,20 @@ export default function MahjongStart() {
             mahjong.hu   = hu;
             mahjong.draw = draw;
 
-            mahjong.lack      = lack;
             mahjong.name      = name;
             mahjong.scoreText = score;
 
             mahjong.timer = timer;
             mahjong.arrow = arrow;
 
-            mahjong.effect.changeCardEffect = new ChangeCardEffect(game, tileTable);
+            mahjong.effect.changeTileEffect = new changeTileEffect(game, tileTable);
 
+            mahjong.ui.avatar      = avatar;
             mahjong.ui.checkButton = checkButton;
 
             mahjong.choseLackDialog = choseLackDialog;
             mahjong.commandDialog   = commandDialog;
+            mahjong.infoDialog      = infoDialog;
         });
 
     };

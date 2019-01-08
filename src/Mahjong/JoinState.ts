@@ -146,7 +146,7 @@ export default class JoinState extends State {
     private *MainLoop(): IterableIterator<Promise<any>> {
         yield this.ui.Input.WaitKeyUp(Input.key.enter);
         this.ui.readyButton.visible = false;
-        this.socket.emit("ready", this.room, this.uuid, (res: number) => {
+        this.socket.emit("ready", this.uuid, this.room, (res: number) => {
             if (res === -1) {
                 window.location.href = "./index.html";
                 return;
