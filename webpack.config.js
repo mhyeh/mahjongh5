@@ -28,11 +28,20 @@ module.exports = {
         port: 9000,
     },
     module: {
-        loaders: [
+        rules: [
+            {
+                type: 'javascript/auto',
+                test: /\.json/,
+                exclude: /(node_modules|bower_components)/,
+                use: [{
+                    loader: 'file-loader',
+                    options: { name: '[name].[ext]' },
+                }]
+            },
             { test: /\.ts$/, enforce: "pre", loader: "tslint-loader" },
             { test: /\.ts$/, exclude: /node_modules/, loader: "babel-loader!ts-loader" },
             { test: /\.js$/, include: /src/, loader: "babel-loader" },
-            { test: /assets(?=\/|\\)/, loader: "file-loader?name=[hash].[ext]" },
+            { test: /assets(?=\/|\\)/, exclude: /\.json/, loader: "file-loader?name=[hash].[ext]" },
             { test: /\.html?$/, loader: "file-loader?name=[name].[ext]" },
             { test: /\.css$/, loader: 'style-loader!css-loader' },
             { test: /\.svg$/, loader: 'svg-inline-loader' },
