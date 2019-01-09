@@ -14,9 +14,10 @@ export default class CommandDialog extends Dialog {
     constructor(game: Phaser.Game, onCreate: (dialog: CommandDialog) => void, show: boolean = false, parent?: PIXI.DisplayObjectContainer) {
         super(game, onCreate, parent);
         // 強制回應、點擊背景等於按下取消、視窗關閉時不銷毀(可重用)
-        this.modal = true;
+        this.modal            = true;
         this.backgroundCancel = false;
-        this.destoryOnHide = false;
+        this.destoryOnHide    = false;
+
         this.windowGroup = game.add.group(this);
         this.windowGroup.add(this.pon);
         this.windowGroup.add(this.gon);
@@ -29,12 +30,12 @@ export default class CommandDialog extends Dialog {
 
     public Show(): Promise<DialogResult> {
         this.windowGroup.visible = true;
-        this.pon.enable     = false;
-        this.hu.enable      = false;
-        this.gon.enable     = false;
-        this.pongon.visible = false;
-        this.ongon.visible  = false;
-        this.none.enable    = true;
+        this.pon.enable          = false;
+        this.hu.enable           = false;
+        this.gon.enable          = false;
+        this.pongon.visible      = false;
+        this.ongon.visible       = false;
+        this.none.enable         = true;
         // 設定dialog物件的值
         return super.Show()
             .then((result) => {

@@ -69,14 +69,16 @@ export default class JoinState extends State {
         }
 
         this.socket.emit("getReadyPlayer", this.room, (nameList: string[]) => {
-            for (const name of nameList) {
-                let index = 0;
-                for (let i = 0; i < 4; i++) {
-                    if (list[i] === name) {
-                        index = i;
+            if (nameList !== null) {
+                for (const name of nameList) {
+                    let index = 0;
+                    for (let i = 0; i < 4; i++) {
+                        if (list[i] === name) {
+                            index = i;
+                        }
                     }
+                    this.nameBlock[index].tint = 0XFFFF33;
                 }
-                this.nameBlock[index].tint = 0XFFFF33;
             }
         });
 
