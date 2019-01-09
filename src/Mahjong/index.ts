@@ -14,6 +14,8 @@ import JoinState from "./JoinState";
 import * as io from "socket.io-client";
 import Game from "mahjongh5/Game";
 import InfoDialog from "./InfoDialog";
+import LackEffect from "./effect/LackEffect";
+import ScrollTextArea from "mahjongh5/ui/ScrollTextArea";
 
 export default function MahjongStart() {
     const GAME_WIDTH  = 2000;
@@ -280,13 +282,17 @@ export default function MahjongStart() {
             const infoDialog = [];
             for (let i = 0; i < 4; i++) {
                 infoDialog.push(new InfoDialog(game, (dialog: InfoDialog) => {
-                    dialog.lack     = game.add.image(0, 0);
-                    dialog.scoreLog = game.add.text(0, 0);
+                    dialog.lack     = game.add.image(0, 0, Assets.button.char.key);
+                    dialog.scoreLog = new ScrollTextArea(game, game.add.text(20, 20, "", { font: "50px Arial", fill: "#FFFFFF" }), 350, 300);
 
-                    dialog.lack.anchor = new Phaser.Point(0.5, 0.5);
+                    dialog.lack.anchor   = new Phaser.Point(0.5, 0.5);
                     dialog.lack.position = new Phaser.Point(50, 50);
-                    dialog.lack.width  = 15;
-                    dialog.lack.height = 15;
+                    dialog.lack.width   = 60;
+                    dialog.lack.height  = 60;
+                    dialog.lack.visible = false;
+
+                    dialog.scoreLog.position = new Phaser.Point(25, 100);
+                    dialog.scoreLog.visible  = false;
                 }));
                 infoDialog[i].backgroundAlpha = 0;
             }
@@ -294,6 +300,25 @@ export default function MahjongStart() {
             infoDialog[1].position = new Phaser.Point(1350, 1100);
             infoDialog[2].position = new Phaser.Point(1350, 200);
             infoDialog[3].position = new Phaser.Point(200,  150);
+
+            infoDialog[0].X = 300;
+            infoDialog[1].X = 1350;
+            infoDialog[2].X = 1350;
+            infoDialog[3].X = 200;
+
+            infoDialog[0].Y = 1200;
+            infoDialog[1].Y = 1100;
+            infoDialog[2].Y = 200;
+            infoDialog[3].Y = 150;
+
+            infoDialog[0].anchorY = 1;
+            infoDialog[1].anchorY = 1;
+
+            const lackEffect = [];
+            lackEffect.push(new LackEffect(game, game.width / 2, 1250,  450,  1360));
+            lackEffect.push(new LackEffect(game, 1700, game.height / 2, 1850, 1180));
+            lackEffect.push(new LackEffect(game, game.width / 2, 230,   1500, 60));
+            lackEffect.push(new LackEffect(game, 280, game.height / 2,  90,   250));
 
             mahjong.socket = socket;
 
@@ -312,6 +337,7 @@ export default function MahjongStart() {
             mahjong.arrow = arrow;
 
             mahjong.effect.changeTileEffect = new changeTileEffect(game, tileTable);
+            mahjong.effect.lackEffect       = lackEffect;
 
             mahjong.ui.avatar      = avatar;
             mahjong.ui.checkButton = checkButton;

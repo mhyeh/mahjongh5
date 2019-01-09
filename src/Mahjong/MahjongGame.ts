@@ -86,7 +86,9 @@ export default class MahjongGame extends State {
 
         this.ui.Input.AddButton(this.ui.checkButton, Input.key.enter, undefined);
         for (let i = 0; i < 4; i++) {
-            this.ui.avatar[i].onInputUp.add(() => this.infoDialog[i].Show());
+            this.ui.avatar[i].onInputUp.add(() => {
+                this.infoDialog[i].Show();
+            });
         }
 
         this.ui.Input.AddButton(this.commandDialog.pon,  Input.key.command, undefined, Input.key.Pon);
@@ -133,15 +135,16 @@ export default class MahjongGame extends State {
             });
             this.socket.emit("getLack", room, (lack: number[]) => {
                 if (typeof lack[0] !== "undefined") {
-                    this.AfterLack(lack);
+                    this.AfterLack(lack, false);
                 }
             });
             this.socket.emit("getHandCount", room, (handCount: number[]) => {
                 if (typeof handCount[0] !== "undefined") {
                     for (let i = 0; i < 4; i++) {
                         if (i !== 0) {
-                            while (this.hand[this.getID(i)].tileCount > handCount[i]) {
-                                this.hand[this.getID(i)].RemoveTile("None");
+                            const idx = this.getID(i);
+                            while (this.hand[idx].tileCount > handCount[i]) {
+                                this.hand[idx].RemoveTile("None");
                             }
                         }
                     }
@@ -153,13 +156,14 @@ export default class MahjongGame extends State {
             this.socket.emit("getDoor", uuid, room, (door: string[][], inVisibleCount: number[], err: boolean) => {
                 if (!err) {
                     for (let i = 0; i < 4; i++) {
+                        const idx = this.getID(i);
                         if (door[i] != null) {
                             for (const tile of door[i]) {
-                                this.door[this.getID(i)].AddTile(tile);
+                                this.door[idx].AddTile(tile);
                             }
                         }
                         while (inVisibleCount[i]--) {
-                            this.door[this.getID(i)].AddTile("None");
+                            this.door[idx].AddTile("None");
                         }
                     }
                 }
@@ -188,9 +192,10 @@ export default class MahjongGame extends State {
             });
             this.socket.emit("getCurrentIdx", room, (playerIdx: number) => {
                 if (playerIdx !== -1) {
-                    this.arrow[this.getID(playerIdx)].tint = 0xFFFFFF;
+                    const idx = this.getID(playerIdx);
+                    this.arrow[idx].tint = 0xFFFFFF;
                     for (let i = 0; i < 4; i++) {
-                        if (i !== this.getID(playerIdx)) {
+                        if (i !== idx) {
                             this.arrow[i].tint = 0x808080;
                         }
                     }
@@ -205,8 +210,6 @@ export default class MahjongGame extends State {
             });
         }
 
-        this.socket.on("remainTile", (num: number) => { this.remainTile.text = "剩餘張數: " + num; });
-
         this.socket.on("dealTile", (hand: string[]) => this.hand[0].SetImmediate(hand));
 
         this.socket.on("change", (defaultTile: string[], time: number) => this.ChangeTile(defaultTile, time));
@@ -217,7 +220,7 @@ export default class MahjongGame extends State {
         this.socket.on("broadcastLack", (lake: number[]) => this.AfterLack(lake));
 
         this.socket.on("draw", (tile: string) => this.draw.AddTile(tile));
-        this.socket.on("broadcastDraw", (id: number) => this.BroadcastDraw(id));
+        this.socket.on("broadcastDraw", (id: number, remainTile: number) => this.BroadcastDraw(id, remainTile));
 
         this.socket.on("throw", async (tile: string, time: number) => this.Throw(tile, time));
         this.socket.on("broadcastThrow", (id: number, tile: string) => this.BroadcastThrow(id, tile));
@@ -321,11 +324,12 @@ export default class MahjongGame extends State {
     }
 
     private BroadcastChange(id: number) {
-        this.effect.changeTileEffect.Play(0, this.getID(id));
-        if (this.getID(id) !== 0) {
-            this.hand[this.getID(id)].RemoveTile("None");
-            this.hand[this.getID(id)].RemoveTile("None");
-            this.hand[this.getID(id)].RemoveTile("None");
+        const idx = this.getID(id);
+        this.effect.changeTileEffect.Play(0, idx);
+        if (idx !== 0) {
+            this.hand[idx].RemoveTile("None");
+            this.hand[idx].RemoveTile("None");
+            this.hand[idx].RemoveTile("None");
         }
     }
 
@@ -356,29 +360,37 @@ export default class MahjongGame extends State {
         this.socket.emit("chooseLack", lackColor);
     }
 
-    private AfterLack(lake: number[]) {
+    private AfterLack(lake: number[], flag: boolean = true) {
         const mapping = ["char", "dot", "bamboo"];
         for (let i = 0; i < 4; i++) {
-            this.infoDialog[this.getID(i)].lack.loadTexture(mapping[lake[i]]);
-            this.infoDialog[this.getID(i)].lack.visible = true;
+            const idx     = this.getID(i);
+            const texture = mapping[lake[i]];
+            this.infoDialog[idx].lack.loadTexture(texture);
+            this.infoDialog[idx].lack.visible = true;
+            if (flag) {
+                this.effect.lackEffect[idx].Play(texture);
+            }
         }
     }
 
-    private BroadcastDraw(id: number) {
+    private BroadcastDraw(id: number, remainTile: number) {
+        this.remainTile.text = "剩餘張數: " + remainTile;
+        const idx = this.getID(id);
         for (let i = 0; i < 4; i++) {
-            if (this.getID(id) === i) {
+            if (idx === i) {
                 this.arrow[i].tint = 0xFFFFFF;
             } else {
                 this.arrow[i].tint = 0x808080;
             }
         }
-        if (this.getID(id) !== 0) {
-            this.hand[this.getID(id)].AddTile("None");
+        if (idx !== 0) {
+            this.hand[idx].AddTile("None");
         }
     }
 
     private async Throw(tile: string, time: number) {
         this.hand[0].EnableAll();
+        this.draw.EnableAll();
         const defaultTile = System.DelayValue(time, tile);
 
         this.timer.Play(time);
@@ -393,15 +405,16 @@ export default class MahjongGame extends State {
         for (let i = 0; i < 4; i++) {
             this.arrow[i].tint = 0x808080;
         }
-        if (this.getID(id) === 0) {
+        const idx = this.getID(id);
+        if (idx === 0) {
             this.clearDraw();
             this.hand[0].RemoveTile(tile);
             this.hand[0].DisableAll();
             this.draw.position = new Phaser.Point(this.hand[0].x + 55 * this.hand[0].tileCount + 20, 1400);
         } else {
-            this.hand[this.getID(id)].RemoveTile("None");
+            this.hand[idx].RemoveTile("None");
         }
-        this.sea[this.getID(id)].AddTile(tile);
+        this.sea[idx].AddTile(tile);
     }
 
     private async Command(tileMap: string, command: COMMAND_TYPE, time: number) {
@@ -503,37 +516,40 @@ export default class MahjongGame extends State {
 
     private Success(from: number, command: COMMAND_TYPE, tile: string, score: number) {
         this.clearDraw();
+        const idx = this.getID(from);
         if (command & COMMAND_TYPE.COMMAND_HU) {
-            this.HU(0, this.getID(from), tile, score);
+            this.HU(0, idx, tile, score);
         } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
             this.ZEMO(0, tile, score);
         } else if (command & COMMAND_TYPE.COMMAND_GON) {
-            this.GON(0, this.getID(from), tile, score);
+            this.GON(0, idx, tile, score);
         } else if (command & COMMAND_TYPE.COMMAND_ONGON) {
             this.ONGON(0, tile, score);
         } else if (command & COMMAND_TYPE.COMMAND_PONGON) {
             this.PONGON(0, tile, score);
         } else if (command & COMMAND_TYPE.COMMAND_PON) {
-            this.PON(0, this.getID(from), tile);
+            this.PON(0, idx, tile);
         }
         console.log(this.hand[0].tileCount);
         this.draw.position = new Phaser.Point(this.hand[0].x + 55 * this.hand[0].tileCount + 20, 1400);
     }
 
     private BroadcastSuccess(from: number, to: number, command: COMMAND_TYPE, tile: string, score: number) {
-        if (this.getID(to) !== 0) {
+        const toIdx   = this.getID(to);
+        const fromIdx = this.getID(from);
+        if (toIdx !== 0) {
             if (command & COMMAND_TYPE.COMMAND_HU) {
-                this.HU(this.getID(to), this.getID(from), tile, score);
+                this.HU(toIdx, fromIdx, tile, score);
             } else if (command & COMMAND_TYPE.COMMAND_ZIMO) {
-                this.ZEMO(this.getID(to), tile, score);
+                this.ZEMO(toIdx, tile, score);
             } else if (command & COMMAND_TYPE.COMMAND_GON) {
-                this.GON(this.getID(to), this.getID(from), tile, score);
+                this.GON(toIdx, fromIdx, tile, score);
             } else if (command & COMMAND_TYPE.COMMAND_ONGON) {
-                this.ONGON(this.getID(to), "None", score);
+                this.ONGON(toIdx, "None", score);
             } else if (command & COMMAND_TYPE.COMMAND_PONGON) {
-                this.PONGON(this.getID(to), tile, score);
+                this.PONGON(toIdx, tile, score);
             } else if (command & COMMAND_TYPE.COMMAND_PON) {
-                this.PON(this.getID(to), this.getID(from), tile);
+                this.PON(toIdx, fromIdx, tile);
             }
         }
         this.updateScore();
@@ -544,11 +560,19 @@ export default class MahjongGame extends State {
         console.log(gameResult);
         console.log("end");
         for (let i = 0; i < 4; i++) {
+            const idx = this.getID(i);
             if (gameResult[i].Door !== null) {
-                this.door[this.getID(i)].SetImmediate(gameResult[i].Door);
+                this.door[idx].SetImmediate(gameResult[i].Door);
             }
-            this.hand[this.getID(i)].SetImmediate(gameResult[i].Hand);
-            this.score[this.getID(i)] = gameResult[i].Score;
+            this.hand[idx].SetImmediate(gameResult[i].Hand);
+            this.score[idx] = gameResult[i].Score;
+            let tmp = "";
+            for (const scoreLog of gameResult[i].ScoreLog) {
+                tmp += scoreLog.Message + ": " + scoreLog.Score + "\n";
+            }
+            this.infoDialog[idx].scoreLog.text.text = tmp;
+            this.infoDialog[idx].scoreLog.visible   = true;
+            this.infoDialog[idx].Redraw();
         }
         this.updateScore();
         await System.Delay(5000);
