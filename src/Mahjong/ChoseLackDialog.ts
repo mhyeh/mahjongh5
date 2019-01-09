@@ -13,12 +13,12 @@ export default class ChoseLackDialog extends Dialog {
     constructor(game: Phaser.Game, onCreate: (dialog: ChoseLackDialog) => void, show: boolean = false, parent?: PIXI.DisplayObjectContainer) {
         super(game, onCreate, parent);
         // 強制回應、點擊背景等於按下取消、視窗關閉時不銷毀(可重用)
-        this.modal = true;
+        this.modal            = true;
         this.backgroundCancel = false;
-        this.destoryOnHide = false;
+        this.destoryOnHide    = false;
 
         this.windowGroup = game.add.group(this);
-        this.background = new Phaser.Graphics(game, 0, 0);
+        this.background  = new Phaser.Graphics(game, 0, 0);
         this.background.beginFill(0x000000, 0.6);
         this.background.drawRoundedRect(0, 0, 300, 80, 5);
         this.background.endFill();
