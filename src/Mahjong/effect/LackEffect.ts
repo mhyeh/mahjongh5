@@ -1,6 +1,4 @@
 import Effect from "mahjongh5/component/Effect";
-import ImageTileTable from "mahjongh5/component/tile/ImageTileTable";
-import CommonTileList from "mahjongh5/component/tile/CommonTileList";
 import * as Assets from "../Assets";
 import * as System from "mahjongh5/System";
 

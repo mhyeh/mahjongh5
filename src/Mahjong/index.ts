@@ -1,4 +1,4 @@
-import * as Mahjongh5 from "mahjongh5/Mahjongnh5";
+import * as Mahjongh5 from "mahjongh5/Mahjongh5";
 import * as Assets from "./Assets";
 import LoadState from "mahjongh5/load/LoadState";
 import MahjongGame from "./MahjongGame";
@@ -16,6 +16,7 @@ import Game from "mahjongh5/Game";
 import InfoDialog from "./InfoDialog";
 import LackEffect from "./effect/LackEffect";
 import ScrollTextArea from "mahjongh5/ui/ScrollTextArea";
+import ImageTile from "mahjongh5/component/tile/ImageTile";
 
 export default function MahjongStart() {
     const GAME_WIDTH  = 2000;
@@ -139,7 +140,7 @@ export default function MahjongStart() {
                 hand.push(new CommonTileList(game, 13, tileTable, undefined, 50, 75, i, i === 0, 16));
                 door.push(new CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false,   16));
                 hu.push(new   CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false,   16, false));
-                sea.push(new  CommonTileList(game, 0,  tileTable, undefined, 40, 60, i, false,   13, false));
+                sea.push(new  CommonTileList(game, 0,  tileTable, undefined, 50, 75, i, false,   13, false));
 
                 hand[i].TileAnchor = new Phaser.Point(0.5, 0.5);
                 door[i].TileAnchor = new Phaser.Point(0.5, 0.5);

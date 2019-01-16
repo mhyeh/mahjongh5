@@ -152,19 +152,19 @@ class SpineTexture extends spine.Texture {
     }
 }
 
-class PhaserSlot extends Phaser.Group {
+class PhaserTile extends Phaser.Group {
     private static readonly blendMode = {
         [spine.BlendMode.Normal]: PIXI.blendModes.NORMAL,
         [spine.BlendMode.Additive]: PIXI.blendModes.ADD,
         [spine.BlendMode.Multiply]: PIXI.blendModes.MULTIPLY,
         [spine.BlendMode.Screen]: PIXI.blendModes.SCREEN,
     };
-    public slot: spine.Slot;
+    public slot: spine.Tile;
     protected attachments: spine.Map<Phaser.Image | Phaser.Rope> = {};
     protected currentAttachmentName: string = "";
     private tintValue: number;
 
-    constructor(game: Phaser.Game, slot: spine.Slot, parent?: PIXI.DisplayObjectContainer) {
+    constructor(game: Phaser.Game, slot: spine.Tile, parent?: PIXI.DisplayObjectContainer) {
         super(game, parent);
         this.slot = slot;
     }
@@ -227,7 +227,7 @@ class PhaserSlot extends Phaser.Group {
             if (bone.getWorldScaleY() < 0 || bone.getWorldScaleX() < 0) {
                 this.rotation = -this.rotation;
             }
-            image.blendMode = PhaserSlot.blendMode[slot.data.blendMode];
+            image.blendMode = PhaserTile.blendMode[slot.data.blendMode];
             if (!this.tintValue) {
                 image.tint = slot.color.r * 0xFF0000 + slot.color.g * 0x00FF00 + slot.color.b * 0x0000FF;
             }
@@ -268,11 +268,11 @@ class PhaserSlot extends Phaser.Group {
      * Create a new sprite to be used with spine.RegionAttachment
      *
      * @method createSprite
-     * @param slot {spine.Slot} The slot to which the attachment is parented
+     * @param slot {spine.Tile} The slot to which the attachment is parented
      * @param attachment {spine.RegionAttachment} The attachment that the sprite will represent
      * @private
      */
-    public createRegion(slot: spine.Slot, attachment: spine.RegionAttachment): Phaser.Image {
+    public createRegion(slot: spine.Tile, attachment: spine.RegionAttachment): Phaser.Image {
         const descriptor = attachment.region as spine.TextureAtlasRegion;
         const baseTexture = (descriptor.texture as SpineTexture).baseTexture;
         const spriteRect: PIXI.Rectangle = new PIXI.Rectangle(
@@ -305,7 +305,7 @@ class PhaserSlot extends Phaser.Group {
         return sprite;
     }
 
-    public createMesh(slot: spine.Slot, attachment: spine.MeshAttachment): Phaser.Rope {
+    public createMesh(slot: spine.Tile, attachment: spine.MeshAttachment): Phaser.Rope {
         const descriptor = attachment.region as spine.TextureAtlasRegion;
         const baseTexture = (descriptor.texture as SpineTexture).baseTexture;
         const texture: PIXI.Texture = new PIXI.Texture(baseTexture);
@@ -341,10 +341,10 @@ export class Spine extends Phaser.Group {
     private skeletonData: spine.SkeletonData;
     private state: spine.AnimationState;
     private stateData: spine.AnimationStateData;
-    private slotContainers: PhaserSlot[];
+    private slotContainers: PhaserTile[];
     private lastTime: number;
     private globalTint: number;
-    private lastDrawOrder: spine.Slot[] = [];
+    private lastDrawOrder: spine.Tile[] = [];
 
     /**
      * @class Spine
@@ -390,7 +390,7 @@ export class Spine extends Phaser.Group {
 
         this.slotContainers = [];
         for (const slot of this.skeleton.slots) {
-            this.slotContainers.push(new PhaserSlot(game, slot, this));
+            this.slotContainers.push(new PhaserTile(game, slot, this));
         }
 
         this.autoUpdate = true;
@@ -428,7 +428,7 @@ export class Spine extends Phaser.Group {
         this.state.apply(this.skeleton);
         this.skeleton.updateWorldTransform();
 
-        const drawOrder: spine.Slot[] = this.skeleton.drawOrder;
+        const drawOrder: spine.Tile[] = this.skeleton.drawOrder;
         const lastDrawOrderLength = this.lastDrawOrder.length;
         for (let i = 0, drawOrderLength = drawOrder.length; i < drawOrderLength; i++) {
             if (i >= lastDrawOrderLength || drawOrder[i] !== this.lastDrawOrder[i]) {
@@ -444,12 +444,12 @@ export class Spine extends Phaser.Group {
         let batchs: Phaser.Rope[] = [];
         let lastMesh: any;
         for (const slot of this.children) {
-            if (slot instanceof PhaserSlot && slot.currentAttachmen instanceof Phaser.Rope) {
+            if (slot instanceof PhaserTile && slot.currentAttachmen instanceof Phaser.Rope) {
                 batchs.push(slot.currentAttachmen);
                 lastMesh = slot.currentAttachmen;
                 lastMesh.batch = 1;
                 lastMesh.batchs = undefined;
-            } else if (slot instanceof PhaserSlot && slot.currentAttachmen && lastMesh) { // 應該還要判斷texture、alpha、blend mode比較好
+            } else if (slot instanceof PhaserTile && slot.currentAttachmen && lastMesh) { // 應該還要判斷texture、alpha、blend mode比較好
                 lastMesh.batchs = batchs;
                 batchs = [];
                 lastMesh = undefined;

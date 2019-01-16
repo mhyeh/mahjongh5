@@ -1,8 +1,9 @@
 import TileTable from "./TileTable";
 import Button from "mahjongh5/ui/Button";
 
-export default abstract class Tlie<TileTableType extends TileTable = TileTable> extends Button {
+export default abstract class Tile<TileTableType extends TileTable = TileTable> extends Button {
     /** 紀錄有哪些ID */
+    public tile: spine.Tile;
     public isClick = false;
     public color: string;
     public uuid:  string;

@@ -537,7 +537,7 @@ declare module spine {
 		static epsilon: number;
 		data: PathConstraintData;
 		bones: Array<Bone>;
-		target: Slot;
+		target: Tile;
 		position: number;
 		spacing: number;
 		rotateMix: number;
@@ -563,7 +563,7 @@ declare module spine {
 		name: string;
 		order: number;
 		bones: BoneData[];
-		target: SlotData;
+		target: TileData;
 		positionMode: PositionMode;
 		spacingMode: SpacingMode;
 		rotateMode: RotateMode;
@@ -616,8 +616,8 @@ declare module spine {
 	class Skeleton {
 		data: SkeletonData;
 		bones: Array<Bone>;
-		slots: Array<Slot>;
-		drawOrder: Array<Slot>;
+		slots: Array<Tile>;
+		drawOrder: Array<Tile>;
 		ikConstraints: Array<IkConstraint>;
 		transformConstraints: Array<TransformConstraint>;
 		pathConstraints: Array<PathConstraint>;
@@ -642,12 +642,12 @@ declare module spine {
 		updateWorldTransform(): void;
 		setToSetupPose(): void;
 		setBonesToSetupPose(): void;
-		setSlotsToSetupPose(): void;
+		setTilesToSetupPose(): void;
 		getRootBone(): Bone;
 		findBone(boneName: string): Bone;
 		findBoneIndex(boneName: string): number;
-		findSlot(slotName: string): Slot;
-		findSlotIndex(slotName: string): number;
+		findTile(slotName: string): Tile;
+		findTileIndex(slotName: string): number;
 		setSkinByName(skinName: string): void;
 		setSkin(newSkin: Skin): void;
 		getAttachmentByName(slotName: string, attachmentName: string): Attachment;
@@ -693,8 +693,8 @@ declare module spine {
 		private scratch;
 		private clipAttachment;
 		private clippingPolygons;
-		clipStart(slot: Slot, clip: ClippingAttachment): number;
-		clipEndWithSlot(slot: Slot): void;
+		clipStart(slot: Tile, clip: ClippingAttachment): number;
+		clipEndWithTile(slot: Tile): void;
 		clipEnd(): void;
 		isClipping(): boolean;
 		clipTriangles(vertices: ArrayLike<number>, verticesLength: number, triangles: ArrayLike<number>, trianglesLength: number, uvs: ArrayLike<number>, light: Color, dark: Color, twoColor: boolean): void;
@@ -706,7 +706,7 @@ declare module spine {
 	class SkeletonData {
 		name: string;
 		bones: BoneData[];
-		slots: SlotData[];
+		slots: TileData[];
 		skins: Skin[];
 		defaultSkin: Skin;
 		events: EventData[];
@@ -722,8 +722,8 @@ declare module spine {
 		imagesPath: string;
 		findBone(boneName: string): BoneData;
 		findBoneIndex(boneName: string): number;
-		findSlot(slotName: string): SlotData;
-		findSlotIndex(slotName: string): number;
+		findTile(slotName: string): TileData;
+		findTileIndex(slotName: string): number;
 		findSkin(skinName: string): Skin;
 		findEvent(eventDataName: string): EventData;
 		findAnimation(animationName: string): Animation;
@@ -763,15 +763,15 @@ declare module spine {
 	}
 }
 declare module spine {
-	class Slot {
-		data: SlotData;
+	class Tile {
+		data: TileData;
 		bone: Bone;
 		color: Color;
 		darkColor: Color;
 		private attachment;
 		private attachmentTime;
 		attachmentVertices: number[];
-		constructor(data: SlotData, bone: Bone);
+		constructor(data: TileData, bone: Bone);
 		getAttachment(): Attachment;
 		setAttachment(attachment: Attachment): void;
 		setAttachmentTime(time: number): void;
@@ -780,7 +780,7 @@ declare module spine {
 	}
 }
 declare module spine {
-	class SlotData {
+	class TileData {
 		index: number;
 		name: string;
 		boneData: BoneData;
@@ -1066,7 +1066,7 @@ declare module spine {
 		vertices: ArrayLike<number>;
 		worldVerticesLength: number;
 		constructor(name: string);
-		computeWorldVertices(slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number, stride: number): void;
+		computeWorldVertices(slot: Tile, start: number, count: number, worldVertices: ArrayLike<number>, offset: number, stride: number): void;
 		applyDeform(sourceAttachment: VertexAttachment): boolean;
 	}
 }
@@ -1098,7 +1098,7 @@ declare module spine {
 }
 declare module spine {
 	class ClippingAttachment extends VertexAttachment {
-		endSlot: SlotData;
+		endTile: TileData;
 		color: Color;
 		constructor(name: string);
 	}

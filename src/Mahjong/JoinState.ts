@@ -2,9 +2,6 @@ import State from "mahjongh5/State";
 import Game from "mahjongh5/Game";
 import Input from "mahjongh5/input/Input";
 import UIController from "./UIController";
-import CommandTileList from "mahjongh5/component/tile/CommonTileList";
-import * as System from "mahjongh5/System";
-import ButtonKey from "mahjongh5/input/ButtonKey";
 import MahjongGame from "./MahjongGame";
 
 export default class JoinState extends State {
